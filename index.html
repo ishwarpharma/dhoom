@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F6E56">
+<title>Field Force Tracker</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--green:#1D9E75;--green-dark:#0F6E56;--green-light:#E1F5EE;--green-text:#085041;--amber:#EF9F27;--amber-light:#FAEEDA;--amber-text:#633806;--red:#D85A30;--red-light:#FAECE7;--red-text:#4A1B0C;--blue:#378ADD;--blue-light:#E6F1FB;--blue-text:#042C53;--gray-light:#F1EFE8;--gray-text:#2C2C2A;--bg:#F5F5F0;--card:#FFFFFF;--border:rgba(0,0,0,0.08);--text:#1a1a18;--text2:#666660;--text3:#99998f;--radius:14px;--radius-sm:8px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);}
+.screen{display:none;height:100%;flex-direction:column;overflow:hidden;}
+.screen.active{display:flex;}
+#pinScreen{background:var(--green-dark);align-items:center;justify-content:center;}
+.pin-logo{width:72px;height:72px;background:rgba(255,255,255,0.15);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.pin-title{color:#fff;font-size:22px;font-weight:600;margin-bottom:4px;}
+.pin-sub{color:rgba(255,255,255,0.6);font-size:13px;margin-bottom:24px;}
+.pin-dots{display:flex;gap:14px;margin-bottom:28px;justify-content:center;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);transition:all 0.2s;}
+.pin-dot.filled{background:#fff;border-color:#fff;}
+.pin-keypad{display:grid;grid-template-columns:repeat(3,72px);gap:12px;}
+.pin-key{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:22px;font-weight:400;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
+.pin-key:active{background:rgba(255,255,255,0.3);transform:scale(0.92);}
+.pin-error{color:#ffaaaa;font-size:13px;margin-top:12px;min-height:20px;text-align:center;}
+.pin-user-select{margin-bottom:20px;}
+.pin-user-select select{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;color:#fff;padding:10px 16px;font-size:15px;width:240px;outline:none;}
+.pin-user-select select option{background:#0F6E56;color:#fff;}
+.app-header{background:var(--green-dark);padding:14px 16px 12px;color:#fff;flex-shrink:0;}
+.header-top{display:flex;justify-content:space-between;align-items:center;}
+.header-name{font-size:16px;font-weight:600;}
+.header-date{font-size:12px;opacity:0.7;margin-top:2px;}
+.header-logout{background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;}
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0;}
+.tab{flex:1;padding:12px 4px;font-size:12px;text-align:center;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all 0.2s;}
+.tab.active{color:var(--green);border-bottom-color:var(--green);font-weight:600;}
+.screen-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.card-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.stat-box{background:var(--card);border-radius:var(--radius-sm);padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.stat-num{font-size:22px;font-weight:700;color:var(--text);line-height:1;}
+.stat-lbl{font-size:11px;color:var(--text3);margin-top:4px;}
+.form-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block;}
+.form-group{margin-bottom:14px;}
+select,input[type="number"],input[type="text"],textarea{width:100%;padding:11px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg);font-size:15px;color:var(--text);outline:none;transition:border-color 0.2s;font-family:inherit;}
+select:focus,input:focus,textarea:focus{border-color:var(--green);background:#fff;}
+textarea{resize:none;height:80px;}
+.btn{width:100%;padding:14px;border-radius:var(--radius-sm);border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn:active{transform:scale(0.97);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-gray{background:var(--gray-light);color:var(--gray-text);}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-green{background:var(--green-light);color:var(--green-text);}
+.badge-amber{background:var(--amber-light);color:var(--amber-text);}
+.badge-red{background:var(--red-light);color:var(--red-text);}
+.badge-blue{background:var(--blue-light);color:var(--blue-text);}
+.badge-gray{background:var(--gray-light);color:var(--gray-text);}
+.geo-bar{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius-sm);font-size:12px;margin-bottom:12px;}
+.geo-bar.verified{background:var(--green-light);color:var(--green-text);}
+.geo-bar.unverified{background:var(--amber-light);color:var(--amber-text);}
+.geo-bar.new-party{background:var(--blue-light);color:var(--blue-text);}
+.geo-bar.error{background:var(--red-light);color:var(--red-text);}
+.geo-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.geo-dot.green{background:var(--green);}
+.geo-dot.amber{background:var(--amber);}
+.geo-dot.blue{background:var(--blue);}
+.geo-dot.red{background:var(--red);}
+.visit-item{padding:12px 0;border-bottom:1px solid var(--border);}
+.visit-item:last-child{border-bottom:none;}
+.visit-name{font-size:14px;font-weight:600;color:var(--text);}
+.visit-meta{font-size:12px;color:var(--text3);margin-top:2px;}
+.visit-amounts{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.remark-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.remark-chip{padding:7px 12px;border-radius:20px;font-size:13px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;transition:all 0.15s;color:var(--text2);}
+.remark-chip.selected{border-color:var(--green);background:var(--green-light);color:var(--green-text);font-weight:600;}
+.remark-chip[data-type="bad"].selected{border-color:var(--red);background:var(--red-light);color:var(--red-text);}
+.remark-chip[data-type="warn"].selected{border-color:var(--amber);background:var(--amber-light);color:var(--amber-text);}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1a18;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;transition:transform 0.3s;white-space:nowrap;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#loader{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9998;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+#loader.show{display:flex;}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader-text{color:#fff;font-size:14px;}
+.active-banner{background:var(--green-dark);color:#fff;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;}
+.active-banner-title{font-size:12px;opacity:0.8;margin-bottom:2px;}
+.active-banner-party{font-size:18px;font-weight:700;}
+.active-banner-time{font-size:12px;opacity:0.75;margin-top:4px;}
+hr.divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
+</style>
+</head>
+<body>
+<div id="loader"><div class="spinner"></div><div class="loader-text" id="loaderText">Please wait...</div></div>
+<div id="toast"></div>
+
+<!-- PIN SCREEN -->
+<div id="pinScreen" class="screen active">
+  <div style="text-align:center;padding:0 24px;">
+    <div class="pin-logo">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <path d="M20 4C13.373 4 8 9.373 8 16c0 9 12 20 12 20s12-11 12-20c0-6.627-5.373-12-12-12z" fill="white"/>
+        <circle cx="20" cy="16" r="4" fill="#1D9E75"/>
+      </svg>
+    </div>
+    <div class="pin-title">Field Force Tracker</div>
+    <div class="pin-sub">Select your name and enter 8-digit PIN</div>
+    <div class="pin-user-select">
+      <select id="userSelect" onchange="onUserChange()">
+        <option value="">Select your name...</option>
+      </select>
+    </div>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+      <div class="pin-dot" id="d4"></div><div class="pin-dot" id="d5"></div>
+      <div class="pin-dot" id="d6"></div><div class="pin-dot" id="d7"></div>
+    </div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key" onclick="pinDel()">&#9003;</button>
+    </div>
+    <div class="pin-error" id="pinError"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainScreen" class="screen">
+  <div class="app-header">
+    <div class="header-top">
+      <div>
+        <div class="header-name" id="headerName">—</div>
+        <div class="header-date" id="headerDate">—</div>
+      </div>
+      <button class="header-logout" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('checkin')">Check In/Out</div>
+    <div class="tab" onclick="switchTab('visits')">Today</div>
+    <div class="tab" onclick="switchTab('summary')">Summary</div>
+  </div>
+  <div class="screen-body">
+
+    <!-- CHECK IN / OUT TAB -->
+    <div id="tab-checkin" class="tab-panel active">
+      <div id="activeBanner" style="display:none;">
+        <div class="active-banner">
+          <div class="active-banner-title">Currently checked in at</div>
+          <div class="active-banner-party" id="activeBannerParty">—</div>
+          <div class="active-banner-time" id="activeBannerTime">—</div>
+        </div>
+      </div>
+      <div id="checkinForm">
+        <div class="card">
+          <div class="card-title">New Visit</div>
+          <div class="form-group">
+            <label class="form-label">Select Stockist / Party</label>
+            <select id="partySelect" onchange="onPartySelect()">
+              <option value="">— Choose party —</option>
+            </select>
+          </div>
+          <div id="geoStatus"></div>
+          <button class="btn btn-green" id="checkinBtn" onclick="doCheckin()" disabled>
+            &#128205; Check In
+          </button>
+        </div>
+      </div>
+      <div id="checkoutForm" style="display:none;">
+        <div class="card">
+          <div class="card-title">Check Out Details</div>
+          <div class="form-group">
+            <label class="form-label">Order Value Taken (&#8377;)</label>
+            <input type="number" id="orderVal" placeholder="0" min="0" inputmode="numeric">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Collection / Payment Received (&#8377;)</label>
+            <input type="number" id="collVal" placeholder="0" min="0" inputmode="numeric">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Remark (tap to select)</label>
+            <div class="remark-chips" id="remarkChips">
+              <div class="remark-chip" data-type="good" onclick="selectRemark(this)">&#127942; Best Party</div>
+              <div class="remark-chip" data-type="good" onclick="selectRemark(this)">&#9989; Good Payment</div>
+              <div class="remark-chip" data-type="good" onclick="selectRemark(this)">&#127978; Good Infra</div>
+              <div class="remark-chip" data-type="warn" onclick="selectRemark(this)">&#8987; Very Late PDC</div>
+              <div class="remark-chip" data-type="warn" onclick="selectRemark(this)">&#128197; PDC Only</div>
+              <div class="remark-chip" data-type="warn" onclick="selectRemark(this)">&#128260; Returns Often</div>
+              <div class="remark-chip" data-type="warn" onclick="selectRemark(this)">&#128483; Negotiator</div>
+              <div class="remark-chip" data-type="bad" onclick="selectRemark(this)">&#128683; Stop Billing</div>
+              <div class="remark-chip" data-type="bad" onclick="selectRemark(this)">&#129317; Regularly Lies</div>
+              <div class="remark-chip" data-type="bad" onclick="selectRemark(this)">&#10060; Cheque Bounce</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Additional Notes (optional)</label>
+            <textarea id="checkoutNotes" placeholder="Any observations, follow-ups..."></textarea>
+          </div>
+          <button class="btn btn-red" onclick="doCheckout()">&#128682; Check Out &amp; Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODAY TAB -->
+    <div id="tab-visits" class="tab-panel">
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num" id="todayCount">0</div><div class="stat-lbl">Parties visited</div></div>
+        <div class="stat-box"><div class="stat-num" id="todayTime">0m</div><div class="stat-lbl">Field time</div></div>
+        <div class="stat-box"><div class="stat-num" id="todayOrder">&#8377;0</div><div class="stat-lbl">Orders today</div></div>
+        <div class="stat-box"><div class="stat-num" id="todayCollection">&#8377;0</div><div class="stat-lbl">Collection today</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Visit Log — Today</div>
+        <div id="todayList"><div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No completed visits yet.</div></div>
+      </div>
+    </div>
+
+    <!-- SUMMARY TAB -->
+    <div id="tab-summary" class="tab-panel">
+      <div class="card">
+        <div class="card-title" id="monthTitle">This Month</div>
+        <div class="stats-row" style="margin-bottom:0;">
+          <div class="stat-box"><div class="stat-num" id="monthVisits">—</div><div class="stat-lbl">Total Visits</div></div>
+          <div class="stat-box"><div class="stat-num" id="monthOrder">—</div><div class="stat-lbl">Total Orders</div></div>
+        </div>
+        <hr class="divider">
+        <div class="stats-row" style="margin-bottom:0;">
+          <div class="stat-box"><div class="stat-num" id="monthCollection">—</div><div class="stat-lbl">Collection</div></div>
+          <div class="stat-box"><div class="stat-num" id="monthAvg">—</div><div class="stat-lbl">Avg. Order</div></div>
+        </div>
+      </div>
+      <button class="btn btn-gray" onclick="loadSummary()" style="margin-bottom:12px;">&#128260; Refresh</button>
+      <div class="card" id="sheetLinkCard" style="display:none;">
+        <div class="card-title">Admin / Manager Access</div>
+        <a id="sheetLink" href="#" target="_blank" style="color:var(--blue);font-size:14px;font-weight:500;">&#128202; Open Google Sheet (Full Data) &#8594;</a>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">All team visit data updates here in real time.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURATION — UPDATE BEFORE DEPLOYING
+// ============================================================
+var CONFIG = {
+  SCRIPT_URL: "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec",
+  SHEET_URL:  "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit",
+  USERS_JSON: "users.json",
+  STOCKISTS_CSV: "stockists_master.csv",
+  GEO_TOLERANCE_METERS: 300
+};
+// ============================================================
+
+var state = {
+  users: [], stockists: [],
+  currentUser: null, currentPin: "",
+  activeVisit: null,
+  currentLat: null, currentLng: null,
+  selectedRemark: "",
+  todayVisits: []
+};
+
+window.onload = function() {
+  loadUsers();
+  loadStockists();
+  setHeaderDate();
+  var saved = sessionStorage.getItem("ff_user");
+  if (saved) {
+    state.currentUser = JSON.parse(saved);
+    var sv = sessionStorage.getItem("ff_visit");
+    if (sv) state.activeVisit = JSON.parse(sv);
+    enterApp();
+  }
+};
+
+function loadUsers() {
+  fetch(CONFIG.USERS_JSON).then(function(r){ return r.json(); }).then(function(data){
+    state.users = data;
+    var sel = document.getElementById("userSelect");
+    data.forEach(function(u){
+      var o = document.createElement("option");
+      o.value = u.id; o.textContent = u.name;
+      sel.appendChild(o);
+    });
+  }).catch(function(e){ console.error("users.json load failed", e); });
+}
+
+function loadStockists() {
+  fetch(CONFIG.STOCKISTS_CSV).then(function(r){ return r.text(); }).then(function(txt){
+    var lines = txt.trim().split("\n");
+    var headers = lines[0].split(",").map(function(h){ return h.trim(); });
+    state.stockists = lines.slice(1).map(function(line){
+      var cols = line.split(",");
+      var obj = {};
+      headers.forEach(function(h,i){ obj[h] = (cols[i]||"").trim().replace(/^"|"$/g,""); });
+      return obj;
+    }).filter(function(s){ return s.party_name; });
+    populatePartyDropdown();
+  }).catch(function(e){ console.error("CSV load failed", e); });
+}
+
+function onUserChange() { state.currentPin = ""; updateDots(); document.getElementById("pinError").textContent = ""; }
+
+function pinKey(k) {
+  if (state.currentPin.length >= 8) return;
+  state.currentPin += k; updateDots();
+  if (state.currentPin.length === 8) verifyPin();
+}
+
+function pinDel() { state.currentPin = state.currentPin.slice(0,-1); updateDots(); }
+
+function updateDots() {
+  for (var i=0;i<8;i++) document.getElementById("d"+i).classList.toggle("filled", i < state.currentPin.length);
+}
+
+function verifyPin() {
+  var uid = document.getElementById("userSelect").value;
+  if (!uid) { document.getElementById("pinError").textContent = "Please select your name first."; state.currentPin=""; updateDots(); return; }
+  var user = state.users.find(function(u){ return u.id === uid; });
+  if (!user) return;
+  if (state.currentPin === user.pin) {
+    state.currentUser = user;
+    sessionStorage.setItem("ff_user", JSON.stringify(user));
+    enterApp();
+  } else {
+    document.getElementById("pinError").textContent = "Incorrect PIN. Try again.";
+    setTimeout(function(){ state.currentPin=""; updateDots(); document.getElementById("pinError").textContent=""; }, 1200);
+  }
+}
+
+function enterApp() {
+  document.getElementById("pinScreen").classList.remove("active");
+  document.getElementById("mainScreen").classList.add("active");
+  document.getElementById("headerName").textContent = state.currentUser.name;
+  setHeaderDate();
+  populatePartyDropdown();
+  renderCheckInTab();
+  loadSummary();
+  if (CONFIG.SHEET_URL && CONFIG.SHEET_URL.indexOf("spreadsheets") > -1) {
+    document.getElementById("sheetLinkCard").style.display = "";
+    document.getElementById("sheetLink").href = CONFIG.SHEET_URL;
+  }
+  startGeo();
+}
+
+function logout() {
+  if (state.activeVisit && !confirm("Active check-in exists. Sign out anyway?")) return;
+  sessionStorage.clear(); state.currentUser=null; state.activeVisit=null; state.currentPin=""; updateDots();
+  document.getElementById("mainScreen").classList.remove("active");
+  document.getElementById("pinScreen").classList.add("active");
+}
+
+function setHeaderDate() {
+  var now = new Date();
+  var opts = {weekday:"short",day:"numeric",month:"short",year:"numeric"};
+  var el = document.getElementById("headerDate");
+  if (el) el.textContent = now.toLocaleDateString("en-IN", opts);
+}
+
+function populatePartyDropdown() {
+  var sel = document.getElementById("partySelect");
+  sel.innerHTML = '<option value="">— Choose party —</option>';
+  state.stockists.forEach(function(s,i){
+    var o = document.createElement("option");
+    o.value = i;
+    o.textContent = s.party_name + (s.area ? " — " + s.area : "");
+    sel.appendChild(o);
+  });
+}
+
+function startGeo() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.watchPosition(function(pos){
+    state.currentLat = pos.coords.latitude;
+    state.currentLng = pos.coords.longitude;
+    onPartySelect();
+  }, function(err){ console.warn("geo", err); }, {enableHighAccuracy:true, maximumAge:15000, timeout:20000});
+}
+
+function onPartySelect() {
+  var sel = document.getElementById("partySelect");
+  var idx = sel.value;
+  var btn = document.getElementById("checkinBtn");
+  var geoDiv = document.getElementById("geoStatus");
+  if (idx === "") { geoDiv.innerHTML=""; btn.disabled=true; return; }
+  var party = state.stockists[idx];
+  var hasGeo = party.latitude && party.latitude !== "";
+  if (!hasGeo) {
+    geoDiv.innerHTML = '<div class="geo-bar new-party"><div class="geo-dot blue"></div><div>New party — no geo saved yet. Location will be recorded on check-in.</div></div>';
+    btn.disabled = (state.currentLat === null); return;
+  }
+  if (state.currentLat === null) {
+    geoDiv.innerHTML = '<div class="geo-bar unverified"><div class="geo-dot amber"></div><div>Getting your location... please wait.</div></div>';
+    btn.disabled = true; return;
+  }
+  var dist = Math.round(haversine(state.currentLat, state.currentLng, parseFloat(party.latitude), parseFloat(party.longitude)));
+  if (dist <= CONFIG.GEO_TOLERANCE_METERS) {
+    geoDiv.innerHTML = '<div class="geo-bar verified"><div class="geo-dot green"></div><div>Location verified &#10003; &nbsp;(' + dist + 'm away)</div></div>';
+    btn.disabled = false;
+  } else {
+    geoDiv.innerHTML = '<div class="geo-bar error"><div class="geo-dot red"></div><div>Too far from stockist (' + dist + 'm, limit ' + CONFIG.GEO_TOLERANCE_METERS + 'm)</div></div>';
+    btn.disabled = true;
+  }
+}
+
+function haversine(lat1,lon1,lat2,lon2){
+  var R=6371000, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function doCheckin() {
+  if (state.activeVisit) { showToast("Already checked in!"); return; }
+  var idx = document.getElementById("partySelect").value;
+  if (idx === "") { showToast("Please select a party."); return; }
+  var party = state.stockists[idx];
+  var geoVerified = !!(party.latitude && party.latitude !== "");
+  showLoader("Checking in...");
+  var payload = {action:"checkin",userId:state.currentUser.id,userName:state.currentUser.name,partyName:party.party_name,area:party.area||"",lat:state.currentLat,lng:state.currentLng,geoVerified:geoVerified};
+  fetch(CONFIG.SCRIPT_URL, {method:"POST",body:JSON.stringify(payload)})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      state.activeVisit = {visitId:data.visitId,party:party.party_name,checkInTime:new Date().toISOString(),lat:state.currentLat,lng:state.currentLng};
+      sessionStorage.setItem("ff_visit", JSON.stringify(state.activeVisit));
+      hideLoader(); showToast("Checked in at " + party.party_name); renderCheckInTab();
+    }).catch(function(){
+      var vid = "LOCAL-" + Date.now();
+      state.activeVisit = {visitId:vid,party:party.party_name,checkInTime:new Date().toISOString(),lat:state.currentLat,lng:state.currentLng};
+      sessionStorage.setItem("ff_visit", JSON.stringify(state.activeVisit));
+      hideLoader(); showToast("Checked in (offline mode)"); renderCheckInTab();
+    });
+}
+
+function renderCheckInTab() {
+  if (state.activeVisit) {
+    document.getElementById("activeBanner").style.display = "";
+    document.getElementById("activeBannerParty").textContent = state.activeVisit.party;
+    var since = new Date(state.activeVisit.checkInTime);
+    document.getElementById("activeBannerTime").textContent = "Since " + since.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+    document.getElementById("checkinForm").style.display = "none";
+    document.getElementById("checkoutForm").style.display = "";
+  } else {
+    document.getElementById("activeBanner").style.display = "none";
+    document.getElementById("checkinForm").style.display = "";
+    document.getElementById("checkoutForm").style.display = "none";
+    state.selectedRemark = "";
+    document.querySelectorAll(".remark-chip").forEach(function(c){ c.classList.remove("selected"); });
+    document.getElementById("orderVal").value = "";
+    document.getElementById("collVal").value = "";
+    document.getElementById("checkoutNotes").value = "";
+  }
+}
+
+function selectRemark(el) {
+  document.querySelectorAll(".remark-chip").forEach(function(c){ c.classList.remove("selected"); });
+  el.classList.add("selected");
+  state.selectedRemark = el.textContent.trim();
+}
+
+function doCheckout() {
+  if (!state.activeVisit) return;
+  var orderVal = document.getElementById("orderVal").value || "0";
+  var collVal = document.getElementById("collVal").value || "0";
+  var notes = document.getElementById("checkoutNotes").value;
+  showLoader("Saving visit data...");
+  var payload = {action:"checkout",visitId:state.activeVisit.visitId,lat:state.currentLat,lng:state.currentLng,orderValue:orderVal,collectionValue:collVal,paymentRemark:state.selectedRemark,notes:notes};
+  var visit = state.activeVisit;
+  var now = new Date();
+  var since = new Date(visit.checkInTime);
+  var duration = Math.round((now-since)/60000);
+  state.todayVisits.push({party:visit.party,checkIn:since.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}),checkOut:now.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}),duration:duration,order:Number(orderVal),collection:Number(collVal),remark:state.selectedRemark});
+  fetch(CONFIG.SCRIPT_URL, {method:"POST",body:JSON.stringify(payload)})
+    .catch(function(){ console.log("checkout sync failed, data saved locally"); });
+  state.activeVisit = null; sessionStorage.removeItem("ff_visit");
+  hideLoader(); showToast("Checked out. Great work!"); renderCheckInTab(); renderTodayTab(); loadSummary();
+}
+
+function renderTodayTab() {
+  var v = state.todayVisits;
+  var tOrd = v.reduce(function(a,x){ return a+x.order; },0);
+  var tCol = v.reduce(function(a,x){ return a+x.collection; },0);
+  var tTim = v.reduce(function(a,x){ return a+x.duration; },0);
+  document.getElementById("todayCount").textContent = v.length;
+  document.getElementById("todayOrder").textContent = "&#8377;"+tOrd.toLocaleString("en-IN");
+  document.getElementById("todayCollection").textContent = "&#8377;"+tCol.toLocaleString("en-IN");
+  document.getElementById("todayTime").textContent = tTim>=60 ? Math.floor(tTim/60)+"h "+(tTim%60)+"m" : tTim+"m";
+  var list = document.getElementById("todayList");
+  if (!v.length) { list.innerHTML='<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0;">No completed visits yet.</div>'; return; }
+  list.innerHTML = v.map(function(x){
+    var rc = x.remark && (x.remark.indexOf("Stop")>-1||x.remark.indexOf("Bounce")>-1||x.remark.indexOf("Lies")>-1) ? "badge-red" : x.remark&&(x.remark.indexOf("Best")>-1||x.remark.indexOf("Good")>-1) ? "badge-green" : "badge-amber";
+    return '<div class="visit-item"><div class="visit-name">'+x.party+'</div><div class="visit-meta">'+x.checkIn+' &rarr; '+x.checkOut+' &nbsp;&middot;&nbsp; '+x.duration+'m</div><div class="visit-amounts"><span class="badge badge-green">Order &#8377;'+x.order.toLocaleString("en-IN")+'</span><span class="badge badge-blue">Coll &#8377;'+x.collection.toLocaleString("en-IN")+'</span>'+(x.remark?'<span class="badge '+rc+'">'+x.remark+'</span>':'')+'</div></div>';
+  }).join("");
+}
+
+function loadSummary() {
+  if (!state.currentUser) return;
+  var now = new Date();
+  document.getElementById("monthTitle").textContent = "Summary — " + now.toLocaleString("en-IN",{month:"long",year:"numeric"});
+  var url = CONFIG.SCRIPT_URL + "?action=summary&userId=" + state.currentUser.id;
+  fetch(url).then(function(r){ return r.json(); }).then(function(data){
+    if (data.success && data.month) {
+      var m = data.month;
+      document.getElementById("monthVisits").textContent = m.visits;
+      document.getElementById("monthOrder").textContent = "&#8377;"+Number(m.order).toLocaleString("en-IN");
+      document.getElementById("monthCollection").textContent = "&#8377;"+Number(m.collection).toLocaleString("en-IN");
+      var avg = m.visits>0 ? Math.round(m.order/m.visits) : 0;
+      document.getElementById("monthAvg").textContent = "&#8377;"+avg.toLocaleString("en-IN");
+      if (data.today && data.today.length > 0) {
+        state.todayVisits = data.today.map(function(x){ return {party:x.party,checkIn:x.checkIn,checkOut:x.checkOut,duration:Number(x.duration)||0,order:Number(x.order)||0,collection:Number(x.collection)||0,remark:x.remark||""}; });
+        renderTodayTab();
+      }
+    }
+  }).catch(function(e){ console.log("Summary not available yet", e); });
+}
+
+function switchTab(name) {
+  var names = ["checkin","visits","summary"];
+  document.querySelectorAll(".tab").forEach(function(t,i){ t.classList.toggle("active", names[i]===name); });
+  document.querySelectorAll(".tab-panel").forEach(function(p){ p.classList.remove("active"); });
+  document.getElementById("tab-"+name).classList.add("active");
+  if (name==="visits") renderTodayTab();
+  if (name==="summary") loadSummary();
+}
+
+function showLoader(t) { document.getElementById("loaderText").textContent=t||"Please wait..."; document.getElementById("loader").classList.add("show"); }
+function hideLoader() { document.getElementById("loader").classList.remove("show"); }
+var toastT;
+function showToast(msg) { var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove("show"); },3000); }
+</script>
+</body>
+</html>

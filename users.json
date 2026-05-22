@@ -1,0 +1,23 @@
+[
+  {
+    "id": "user001",
+    "name": "Rajesh Kumar",
+    "pin": "12345678",
+    "area": "Borivali-Malad",
+    "manager": "admin"
+  },
+  {
+    "id": "user002",
+    "name": "Suresh Patil",
+    "pin": "87654321",
+    "area": "Bandra-Andheri",
+    "manager": "admin"
+  },
+  {
+    "id": "user003",
+    "name": "Amit Sharma",
+    "pin": "11223344",
+    "area": "Kandivali-Dahisar",
+    "manager": "admin"
+  }
+]
