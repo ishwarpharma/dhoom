@@ -549,7 +549,14 @@ function setHeaderDate() {
 function populatePartyDropdown() {
   var sel=document.getElementById("partySelect");
   sel.innerHTML='<option value="">— Choose party —</option>';
+  var userArea = (state.currentUser && state.currentUser.area) ? state.currentUser.area.trim().toUpperCase() : "ALL";
+  var userAreas = userArea.split(/[,\-\/]/).map(function(a){ return a.trim(); });
   state.stockists.forEach(function(s,i){
+    var partyArea = (s.area || "").trim().toUpperCase();
+    // ALL = see every party; blank party area = visible to everyone; else match
+    var show = userArea === "ALL" || !partyArea ||
+      userAreas.some(function(ua){ return partyArea.indexOf(ua) > -1 || ua.indexOf(partyArea) > -1; });
+    if (!show) return;
     var o=document.createElement("option");
     o.value=i; o.textContent=s.party_name+(s.area?" — "+s.area:"");
     sel.appendChild(o);
