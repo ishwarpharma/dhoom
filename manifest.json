@@ -1,7 +1,7 @@
 {
-  "name": "Field Force Tracker",
-  "short_name": "FF Tracker",
-  "description": "Field rep check-in and visit tracking app",
+  "name": "Ishwar Field Force Tracker",
+  "short_name": "Dhoom App",
+  "description": "Ishwar Field rep check-in and visit tracking app",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0F6E56",
