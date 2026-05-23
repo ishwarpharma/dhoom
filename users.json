@@ -1,18 +1,68 @@
 [
   {
-    "id": "user001",
+    "id": "baka",
     "name": "Brijesh Shah",
     "pin": "09011979",
     "area": "ALL",
     "manager": "admin"
   },
   {
-    "id": "user002",
-    "name": "Suresh Patil",
-    "pin": "87654321",
-    "area": "Bandra-Andheri",
+    "id": "Rajendra",
+    "name": "Rajendra Sakpal",
+    "pin": "98234643",
+    "area": "ALL",
     "manager": "admin"
   },
+  {
+    "id": "Pandit",
+    "name": "Pandit Lingade",
+    "pin": "98601680",
+    "area": "ALL",
+    "manager": "admin"
+  },
+  {
+    "id": "Pravin",
+    "name": "Pravin Pawar",
+    "pin": "84129353",
+    "area": "ALL",
+    "manager": "admin"
+  },
+  {
+    "id": "Yogesh",
+    "name": "Yogesh Singh",
+    "pin": "98926116",
+    "area": "ALL",
+    "manager": "admin"
+  },
+  {
+    "id": "Pankaj",
+    "name": "Pankaj Kori",
+    "pin": "96197132",
+    "area": "ALL",
+    "manager": "admin"
+  },
+  {
+    "id": "Shankar",
+    "name": "Shankar Bengade",
+    "pin": "98234643",
+    "area": "ALL",
+    "manager": "admin"
+  },
+  {
+    "id": "Rohit",
+    "name": "Rohit Chalke",
+    "pin": "97684330",
+    "area": "ALL",
+    "manager": "admin"
+  },
+  {
+    "id": "Vinay",
+    "name": "Vinay Lakhade",
+    "pin": "86696645",
+    "area": "ALL",
+    "manager": "admin"
+  },
+  
   {
     "id": "user003",
     "name": "Amit Sharma",
