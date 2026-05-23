@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dhoom">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#FF6B00">
@@ -41,17 +41,15 @@
   --font:'Nunito',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--text);}
+html,body{height:100%;overflow:hidden;background:#FF6B00;font-family:var(--font);color:var(--text);}
+
 
 /* SCREENS */
-.screen{display:none;height:100%;flex-direction:column;overflow:hidden;}
+.screen{display:none;height:100%;flex-direction:column;overflow:hidden;background:var(--bg);}
 .screen.active{display:flex;}
 
 /* ── PIN SCREEN ── */
-#pinScreen{
-  background:linear-gradient(160deg,#FF6B00 0%,#FF9F45 45%,#FFF8F0 100%);
-  align-items:center;justify-content:center;
-}
+#pinScreen{background:linear-gradient(160deg,#FF6B00 0%,#FF9F45 45%,#FFF8F0 100%);align-items:center;justify-content:center;}
 .pin-card{background:#fff;border-radius:28px;padding:32px 28px 28px;width:calc(100% - 40px);max-width:360px;box-shadow:0 20px 60px rgba(255,107,0,0.2);}
 .pin-logo-wrap{text-align:center;margin-bottom:4px;}
 .pin-logo-wrap svg{width:64px;height:64px;}
@@ -68,12 +66,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--fon
 
 /* ── HEADER ── */
 .app-header{
-  background:#fff;
-  padding:calc(var(--safe-top) + 10px) 16px 10px;
-  border-bottom:1px solid var(--border);
+  background:#FF6B00;
+  padding:calc(env(safe-area-inset-top, 44px) + 10px) 16px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.2);
   flex-shrink:0;
   display:flex;align-items:center;justify-content:space-between;
+  position:relative;z-index:1;
 }
+.header-appname{color:#fff !important;}
+.header-username{color:rgba(255,255,255,0.85) !important;}
+.header-date{color:rgba(255,255,255,0.85) !important;}
 .header-left{display:flex;align-items:center;gap:10px;}
 .header-logo svg{width:32px;height:32px;}
 .header-name-wrap{}
@@ -357,8 +359,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:12px 0;}
 // CONFIG — update these two URLs only
 // ════════════════════════════════════
 var CONFIG = {
-  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxcEVZrK1Px3mnKY3EVRgGUCW7TfOmtyB85S5RzM2FaOKGEpGkqg1Y-4MMXg6ww6qca/exec",
-  SHEET_URL:  "https://docs.google.com/spreadsheets/d/1GBwzs9WKahGv--7GW-J58JDcNXBXYLfmh-8BNEWlZNA/edit",
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbysz5L-MOu0T6IH-c9CmRzCRpE6DoUynVvBhhfSALPmv8_Za5XX1910kW8HD4TJz6bdUA/exec",
+  SHEET_URL:  "https://docs.google.com/spreadsheets/d/1kisXe0RlzlVBlzL6qTZOgm_A9OUUE0Yid7a70MCIfYE/edit",
   USERS_JSON: "users.json",
   STOCKISTS_CSV: "stockists_master.csv",
   IS_PWA: window.matchMedia("(display-mode:standalone)").matches || navigator.standalone === true
