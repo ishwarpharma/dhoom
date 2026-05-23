@@ -176,6 +176,7 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
   </div>
   <div class="tb-right">
     <span class="tb-updated" id="lastUpd">Not loaded</span>
+    <span class="tb-updated" id="nextRefresh" style="color:#FF6B00;font-size:11px;"></span>
     <button class="btn-rf" id="rfBtn" onclick="loadData()">↺ Refresh</button>
   </div>
 </div>
@@ -189,12 +190,12 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
     <!-- Quick date chips -->
     <div class="date-chips" style="margin-bottom:10px;">
       <div class="fl" style="align-self:center;margin-right:4px;">Quick:</div>
-      <div class="dc" onclick="setQuick('today')">📅 Today</div>
+      <div class="dc active" id="dc-today" onclick="setQuick('today')">📅 Today</div>
       <div class="dc" onclick="setQuick('yesterday')">⏮ Yesterday</div>
       <div class="dc" onclick="setQuick('week')">📆 This Week</div>
       <div class="dc" onclick="setQuick('month')" id="dc-month">📅 This Month</div>
       <div class="dc" onclick="setQuick('last30')">🗓 Last 30 Days</div>
-      <div class="dc active" id="dc-all" onclick="setQuick('all')">♾ All Time</div>
+      <div class="dc" id="dc-all" onclick="setQuick('all')">♾ All Time</div>
     </div>
     <!-- Custom date + rep filter -->
     <div class="fbar-top">
@@ -287,11 +288,22 @@ var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysz5L-MOu0T6IH-c9CmRz
 // ════════════════════════════════
 
 var allRows=[], filtered=[], displayed=[];
-var sortCol=0, sortAsc=false, pg=1, perPg=30;
+var sortCol=0, sortAsc=false, pg=1, perPg=30, autoRefreshActive=true;
 
 window.onload = function(){
-  setQuick('all');
+  setQuick('today');
   loadData();
+  // Auto-refresh every 5 minutes
+  setInterval(function(){ silentRefresh(); }, 5 * 60 * 1000);
+  // Countdown display
+  var countdown = 300;
+  setInterval(function(){
+    countdown--;
+    if(countdown <= 0){ countdown = 300; }
+    var m = Math.floor(countdown/60), s = countdown%60;
+    var el = document.getElementById('nextRefresh');
+    if(el) el.textContent = '↺ in ' + m + ':' + (s<10?'0':'')+s;
+  }, 1000);
 };
 
 // ── QUICK DATE PRESETS ──
@@ -321,6 +333,43 @@ document.querySelectorAll('.dc').forEach(function(el){
 function fmt(d){return d.toISOString().slice(0,10);}
 
 // ── LOAD DATA FROM APPS SCRIPT ──
+function silentRefresh(){
+  // Remember current filter state
+  var fr=document.getElementById('fFrom').value;
+  var to=document.getElementById('fTo').value;
+  var rep=document.getElementById('fRep').value;
+  var sta=document.getElementById('fStation').value;
+  var q=document.getElementById('tsearch').value;
+  var url = SCRIPT_URL + "?action=all&cb=" + Date.now();
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.success) return;
+      allRows = (data.rows||[]).map(function(r){
+        var rawDate = String(r.date||'');
+        var normDate = rawDate;
+        if(rawDate.length>10 && rawDate.indexOf('-')===-1){var d=new Date(rawDate);if(!isNaN(d.getTime()))normDate=fmt(d);}
+        if(rawDate.indexOf('/')>-1){var parts=rawDate.split('/');if(parts.length===3)normDate=parts[2]+'-'+parts[1].padStart(2,'0')+'-'+parts[0].padStart(2,'0');}
+        var rawTime=String(r.time||'');
+        if(rawTime.length>8){var td=new Date(rawTime);if(!isNaN(td.getTime()))rawTime=td.getHours().toString().padStart(2,'0')+':'+td.getMinutes().toString().padStart(2,'0');}
+        return [normDate,rawTime,r.userId,r.repName,r.area,r.party,r.station,r.lat,r.lng,r.order,r.collection,r.rating,r.remark];
+      });
+      populateDropdowns();
+      // Restore filters
+      document.getElementById('fFrom').value=fr;
+      document.getElementById('fTo').value=to;
+      if(rep) document.getElementById('fRep').value=rep;
+      if(sta) document.getElementById('fStation').value=sta;
+      if(q) document.getElementById('tsearch').value=q;
+      applyFilters();
+      document.getElementById('lastUpd').textContent="Auto-updated "+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      // Show subtle pulse on the refresh button
+      var btn=document.getElementById('rfBtn');
+      btn.textContent='✓ Refreshed';
+      setTimeout(function(){btn.textContent='↺ Refresh';},2000);
+    }).catch(function(e){console.log('Silent refresh failed:',e);});
+}
+
 function loadData(){
   showLoader(true);
   document.getElementById('rfBtn').disabled=true;
@@ -432,7 +481,17 @@ function onSearch(){
   displayed=!q?filtered.slice():filtered.filter(function(r){
     return[r[3],r[5],r[6],r[11],r[12]].some(function(v){return(v||'').toLowerCase().indexOf(q)>-1;});
   });
-  sortData();pg=1;renderAll();
+  // Default: newest first (date desc, time desc)
+  if(sortCol===0 && !sortAsc){
+    displayed.sort(function(a,b){
+      var dc=String(b[0]||'').localeCompare(String(a[0]||''));
+      if(dc!==0)return dc;
+      return String(b[1]||'').localeCompare(String(a[1]||''));
+    });
+  } else {
+    sortData();
+  }
+  pg=1;renderAll();
 }
 
 // ── SORT ──
@@ -445,6 +504,14 @@ function sortData(){
   displayed.sort(function(a,b){
     var av=a[c]||'',bv=b[c]||'';
     if(c===9||c===10){av=Number(av)||0;bv=Number(bv)||0;return sortAsc?av-bv:bv-av;}
+    // For date column, also sort by time as secondary key
+    if(c===0){
+      var cmp=String(bv).localeCompare(String(av)); // newest date first by default
+      if(!sortAsc) return cmp;
+      cmp=String(av).localeCompare(String(bv));
+      if(cmp!==0) return cmp;
+      return String(a[1]||'').localeCompare(String(b[1]||''));
+    }
     return sortAsc?String(av).localeCompare(String(bv)):String(bv).localeCompare(String(av));
   });
 }
