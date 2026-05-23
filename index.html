@@ -173,12 +173,41 @@ hr.div{border:none;border-top:1px solid var(--border);margin:12px 0;}
 
 /* ── SECTION HEADER ── */
 .section-head{font-size:13px;font-weight:800;color:var(--text2);margin:16px 0 10px;display:flex;align-items:center;gap:6px;}
+
+/* LOCATION BLOCKER */
+.loc-blocker{display:none;position:fixed;inset:0;background:rgba(255,107,0,0.97);z-index:8000;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:32px;}
+.loc-blocker.show{display:flex;}
+.loc-blocker-icon{font-size:72px;margin-bottom:16px;animation:bounce 1.2s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.loc-blocker-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:10px;}
+.loc-blocker-msg{font-size:15px;color:rgba(255,255,255,0.9);line-height:1.6;margin-bottom:24px;max-width:320px;}
+.loc-blocker-steps{background:rgba(255,255,255,0.15);border-radius:14px;padding:18px 20px;margin-bottom:24px;text-align:left;max-width:320px;width:100%;}
+.loc-blocker-steps li{color:#fff;font-size:13px;margin-bottom:8px;line-height:1.5;list-style:none;padding-left:4px;}
+.loc-blocker-steps li::before{content:"→  ";font-weight:800;}
+.btn-try-again{background:#fff;color:var(--orange);border:none;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--font);}
+.loc-warn{display:none;background:var(--red);color:#fff;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:700;margin-bottom:14px;text-align:center;}
+.loc-warn.show{display:block;animation:shake 0.4s ease;}
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
+
 </style>
 </head>
 <body>
 
 <div id="loader"><div class="spin"></div><div class="load-txt" id="loaderText">Saving...</div></div>
 <div id="toast"></div>
+<!-- LOCATION BLOCKER OVERLAY -->
+<div class="loc-blocker" id="locBlocker">
+  <div class="loc-blocker-icon">📍</div>
+  <div class="loc-blocker-title">Location Required</div>
+  <div class="loc-blocker-msg">Dhoom needs your GPS location to mark a visit. Without location, visit cannot be recorded.</div>
+  <ul class="loc-blocker-steps">
+    <li><b>iPhone:</b> Settings → Safari → Location → Allow</li>
+    <li><b>Android:</b> Tap the 🔒 lock icon in browser bar → Allow Location</li>
+    <li><b>Installed app:</b> Settings → Dhoom → Location → Allow</li>
+  </ul>
+  <button class="btn-try-again" onclick="retryGeo()">🔄 Try Again</button>
+</div>
+
 <div class="success-flash" id="successFlash">
   <div class="success-icon">✅</div>
   <div class="success-text" id="successText">Visit Marked!</div>
@@ -311,7 +340,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:12px 0;}
           </div>
         </div>
 
-        <button class="btn btn-orange" onclick="markVisit()">✅ Mark Presence</button>
+        <div class="loc-warn" id="locWarn">⚠️ Location not available — please allow GPS access first</div>
+        <button class="btn btn-orange" onclick="markVisit()" id="markBtn">✅ Mark Presence</button>
       </div>
     </div>
 
@@ -462,6 +492,14 @@ function enterApp() {
   document.getElementById("mainScreen").classList.add("active");
   document.getElementById("headerUser").textContent = state.user.name + (state.user.area && state.user.area!=="ALL" ? " · " + state.user.area : "");
   setDate();
+  // Immediately request location permission on app entry
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(p){ state.lat=p.coords.latitude; state.lng=p.coords.longitude; },
+      function(err){ if(err.code===1) showLocBlocker(); },
+      {enableHighAccuracy:true, timeout:10000}
+    );
+  }
   startGeo();
   renderToday();
   renderMonth();
@@ -477,15 +515,45 @@ function enterApp() {
 
 // ── GEO ──
 function startGeo() {
-  if (!navigator.geolocation) { setLocBad("GPS not available"); return; }
-  navigator.geolocation.watchPosition(function(p){
-    state.lat = p.coords.latitude; state.lng = p.coords.longitude;
-    var acc = Math.round(p.coords.accuracy);
-    setLocOk("Location ready (±" + acc + "m)");
-  }, function(){
-    setLocBad("Location unavailable — visit will save without GPS");
-    state.lat = null; state.lng = null;
-  }, {enableHighAccuracy:true, maximumAge:20000, timeout:25000});
+  if (!navigator.geolocation) {
+    showLocBlocker("GPS is not supported on this device/browser. Please use Chrome or Safari.");
+    return;
+  }
+  navigator.geolocation.watchPosition(
+    function(p){
+      state.lat = p.coords.latitude;
+      state.lng = p.coords.longitude;
+      var acc = Math.round(p.coords.accuracy);
+      setLocOk("Location ready (±" + acc + "m)");
+      hideLocBlocker();
+      // hide inline warning too
+      document.getElementById("locWarn").classList.remove("show");
+    },
+    function(err){
+      state.lat = null; state.lng = null;
+      if (err.code === 1) {
+        // PERMISSION_DENIED — show full blocker
+        showLocBlocker();
+      } else {
+        // POSITION_UNAVAILABLE or TIMEOUT — show inline warning, keep retrying
+        setLocBad("Searching for GPS signal...");
+      }
+    },
+    {enableHighAccuracy:true, maximumAge:10000, timeout:15000}
+  );
+}
+
+function showLocBlocker() {
+  document.getElementById("locBlocker").classList.add("show");
+}
+function hideLocBlocker() {
+  document.getElementById("locBlocker").classList.remove("show");
+}
+function retryGeo() {
+  document.getElementById("locBlocker").classList.remove("show");
+  setLocBad("Requesting location again...");
+  // Re-request by calling startGeo — it will watchPosition again
+  startGeo();
 }
 
 function setLocOk(msg) {
@@ -513,6 +581,19 @@ function markVisit() {
   var station = document.getElementById("stationInput").value.trim();
   if (!party) { showToast("Please enter party name"); return; }
   if (!station) { showToast("Please enter station/area"); return; }
+
+  // MANDATORY GPS CHECK
+  if (!state.lat || !state.lng) {
+    var warn = document.getElementById("locWarn");
+    warn.classList.add("show");
+    // Shake the warning
+    warn.style.animation = "none";
+    setTimeout(function(){ warn.style.animation = ""; }, 10);
+    showToast("❌ Location required! Please allow GPS access.");
+    // Try requesting again
+    startGeo();
+    return;
+  }
 
   var order = Number(document.getElementById("orderVal").value) || 0;
   var coll  = Number(document.getElementById("collVal").value) || 0;
