@@ -238,7 +238,7 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
 
   <!-- CHARTS -->
   <div class="crow">
-    <div class="cc"><div class="ct">Rep Performance</div><div class="cs">Orders collected by rep</div><div class="bar-chart" id="repChart"></div></div>
+    <div class="cc"><div class="ct">Rep Performance</div><div class="cs">Visits per rep (P = unique parties)</div><div class="bar-chart" id="repChart"></div></div>
     <div class="cc"><div class="ct">Party Ratings</div><div class="cs">Distribution of ratings given</div><div class="donut-wrap"><svg id="donutSvg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="36" fill="none" stroke="#eee" stroke-width="16"/></svg><div class="dlegend" id="dlegend"></div></div></div>
     <div class="cc"><div class="ct">Daily Trend</div><div class="cs">Visits per day</div><div class="trend-wrap"><svg class="trend-svg" id="trendSvg" viewBox="0 0 300 110" preserveAspectRatio="none"></svg></div></div>
   </div>
@@ -552,15 +552,22 @@ function renderCharts(){repChart();donutChart();trendChart();}
 
 function repChart(){
   var d={};
-  displayed.forEach(function(r){var nm=r[3]||'?';if(!d[nm])d[nm]={o:0,v:0};d[nm].o+=Number(r[9])||0;d[nm].v++;});
-  var sorted=Object.entries(d).sort(function(a,b){return b[1].o-a[1].o;}).slice(0,8);
-  var max=sorted.length?sorted[0][1].o:1;
+  displayed.forEach(function(r){
+    var nm=r[3]||'?';
+    if(!d[nm])d[nm]={visits:0,parties:new Set()};
+    d[nm].visits++;
+    if(r[5]) d[nm].parties.add(r[5]);
+  });
+  // Sort by number of visits descending
+  var sorted=Object.entries(d).sort(function(a,b){return b[1].visits-a[1].visits;}).slice(0,8);
+  var max=sorted.length?sorted[0][1].visits:1;
   var cols=['#FF6B00','#2563EB','#16A34A','#7C3AED','#D97706','#DC2626','#0891B2','#BE185D'];
   var html=sorted.map(function(e,i){
-    var pct=max>0?Math.max(2,e[1].o/max*100):2;
+    var pct=max>0?Math.max(2,e[1].visits/max*100):2;
+    var uniqueP=e[1].parties.size;
     return '<div class="brow"><div class="blbl" title="'+e[0]+'">'+e[0].split(' ')[0]+'</div>'+
-      '<div class="btrack"><div class="bfill" style="width:'+pct+'%;background:'+cols[i%8]+'">'+(pct>18?fmtM(e[1].o):'')+'</div></div>'+
-      '<div class="bval">'+e[1].v+' visits</div></div>';
+      '<div class="btrack"><div class="bfill" style="width:'+pct+'%;background:'+cols[i%8]+'">'+(pct>18?e[1].visits+' visits':'')+'</div></div>'+
+      '<div class="bval" title="'+uniqueP+' unique parties">'+e[1].visits+' <span style="color:var(--t3);font-size:10px;">('+uniqueP+'P)</span></div></div>';
   }).join('');
   document.getElementById('repChart').innerHTML=html||'<div class="empty"><div class="etxt">No data</div></div>';
 }
