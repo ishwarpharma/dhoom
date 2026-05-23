@@ -69,7 +69,13 @@
     "area": "ALL",
     "manager": "admin"
   },
-
+{
+    "id": "Dishali",
+    "name": "Dishali",
+    "pin": "81082921",
+    "area": "ALL",
+    "manager": "admin"
+  },
   
   {
     "id": "user003",
