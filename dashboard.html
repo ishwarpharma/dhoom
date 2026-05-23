@@ -194,7 +194,7 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
       <div class="dc" onclick="setQuick('week')">📆 This Week</div>
       <div class="dc" onclick="setQuick('month')" id="dc-month">📅 This Month</div>
       <div class="dc" onclick="setQuick('last30')">🗓 Last 30 Days</div>
-      <div class="dc" onclick="setQuick('all')">♾ All Time</div>
+      <div class="dc active" id="dc-all" onclick="setQuick('all')">♾ All Time</div>
     </div>
     <!-- Custom date + rep filter -->
     <div class="fbar-top">
@@ -290,7 +290,7 @@ var allRows=[], filtered=[], displayed=[];
 var sortCol=0, sortAsc=false, pg=1, perPg=30;
 
 window.onload = function(){
-  setQuick('month');
+  setQuick('all');
   loadData();
 };
 
@@ -307,7 +307,7 @@ function setQuick(q){
   else if(q==='all'){from=new Date('2024-01-01');to=now;}
   document.getElementById('fFrom').value=fmt(from);
   document.getElementById('fTo').value=fmt(to);
-  if(allRows.length) applyFilters();
+  if(allRows.length) applyFilters(); // only filter if data already loaded
 }
 
 // Called from onclick on chip — need to handle 'this'
@@ -335,8 +335,38 @@ function loadData(){
       if(!data.success) throw new Error(data.error||"Script returned error");
       // Convert object rows to arrays for sorting/indexing
       allRows = (data.rows||[]).map(function(r){
-        return [r.date,r.time,r.userId,r.repName,r.area,r.party,r.station,r.lat,r.lng,r.order,r.collection,r.rating,r.remark];
+        // Normalize date — sheet may return Date object stringified in various formats
+        var rawDate = String(r.date||'');
+        var normDate = rawDate;
+        // Handle "Fri May 23 2026..." format
+        if (rawDate.length > 10 && rawDate.indexOf('-') === -1) {
+          var d = new Date(rawDate);
+          if (!isNaN(d.getTime())) normDate = fmt(d);
+        }
+        // Handle "23/05/2026" format
+        if (rawDate.indexOf('/') > -1) {
+          var parts = rawDate.split('/');
+          if (parts.length === 3) {
+            // could be dd/mm/yyyy or mm/dd/yyyy — assume dd/mm/yyyy (Indian)
+            normDate = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0');
+          }
+        }
+        // Handle Excel serial date number (e.g. 45800)
+        if (!isNaN(Number(rawDate)) && Number(rawDate) > 40000) {
+          var d = new Date((Number(rawDate) - 25569) * 86400000);
+          normDate = fmt(d);
+        }
+        var rawTime = String(r.time||'');
+        // Normalize time — may come as full date string
+        if (rawTime.length > 8) {
+          var td = new Date(rawTime);
+          if (!isNaN(td.getTime())) {
+            rawTime = td.getHours().toString().padStart(2,'0') + ':' + td.getMinutes().toString().padStart(2,'0');
+          }
+        }
+        return [normDate, rawTime, r.userId, r.repName, r.area, r.party, r.station, r.lat, r.lng, r.order, r.collection, r.rating, r.remark];
       });
+      console.log("Sample dates:", allRows.slice(0,3).map(function(r){return r[0];}));
       populateDropdowns();
       applyFilters();
       document.getElementById('lastUpd').textContent = "Updated "+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
