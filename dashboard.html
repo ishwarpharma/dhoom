@@ -151,23 +151,6 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
 
 @media(max-width:900px){.crow{grid-template-columns:1fr;}.topbar{padding:0 14px;}.page{padding:14px;}}
 @media(max-width:600px){.krow{grid-template-columns:1fr 1fr;}.tb-sub{display:none;}}
-
-/* REP TIMING CHART */
-.rt-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
-.rt-row:last-child{border-bottom:none;}
-.rt-name{font-size:12px;font-weight:700;color:var(--text);width:68px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.rt-timeline{flex:1;position:relative;height:28px;}
-.rt-track{position:absolute;top:50%;left:0;right:0;height:3px;background:var(--border);transform:translateY(-50%);border-radius:2px;}
-.rt-bar{position:absolute;top:50%;height:5px;background:linear-gradient(90deg,#16A34A,#FF6B00);transform:translateY(-50%);border-radius:3px;min-width:6px;}
-.rt-dot-first{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:#16A34A;border:2px solid #fff;box-shadow:0 0 0 1px #16A34A;transform:translate(-50%,-50%);}
-.rt-dot-last{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:#FF6B00;border:2px solid #fff;box-shadow:0 0 0 1px #FF6B00;transform:translate(-50%,-50%);}
-.rt-times{display:flex;flex-direction:column;align-items:flex-end;width:72px;flex-shrink:0;}
-.rt-first{font-size:11px;font-weight:700;color:#16A34A;}
-.rt-last{font-size:11px;font-weight:700;color:#FF6B00;}
-.rt-count{font-size:10px;color:#9CA3AF;margin-top:1px;}
-.rt-legend{display:flex;gap:14px;margin-bottom:10px;font-size:11px;color:#9CA3AF;font-weight:600;}
-.rt-legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;}
-
 </style>
 </head>
 <body>
@@ -194,7 +177,7 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
   <div class="tb-right">
     <span class="tb-updated" id="lastUpd">Not loaded</span>
     <span class="tb-updated" id="nextRefresh" style="color:#FF6B00;font-size:11px;"></span>
-    <button class="btn-rf" id="rfBtn" onclick="loadData()">↺ Refresh</button>
+    <button class="btn-rf" id="rfBtn" onclick="refreshToToday()">↺ Refresh</button>
   </div>
 </div>
 
@@ -256,7 +239,7 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
   <!-- CHARTS -->
   <div class="crow">
     <div class="cc"><div class="ct">Rep Performance</div><div class="cs">Visits per rep (P = unique parties)</div><div class="bar-chart" id="repChart"></div></div>
-    <div class="cc"><div class="ct">Rep Activity Today</div><div class="cs">First visit ▸ Last visit time per rep</div><div id="repTimingChart"></div></div>
+    <div class="cc"><div class="ct">Party Ratings</div><div class="cs">Distribution of ratings given</div><div class="donut-wrap"><svg id="donutSvg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="36" fill="none" stroke="#eee" stroke-width="16"/></svg><div class="dlegend" id="dlegend"></div></div></div>
     <div class="cc"><div class="ct">Daily Trend</div><div class="cs">Visits per day</div><div class="trend-wrap"><svg class="trend-svg" id="trendSvg" viewBox="0 0 300 110" preserveAspectRatio="none"></svg></div></div>
   </div>
 
@@ -325,8 +308,13 @@ window.onload = function(){
 
 // ── QUICK DATE PRESETS ──
 function setQuick(q){
+  // Remove active from all chips
   document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
-  event && event.target && event.target.classList.add('active');
+  // Find and highlight the correct chip by matching its onclick attribute
+  document.querySelectorAll('.dc').forEach(function(d){
+    var oc = d.getAttribute('onclick') || '';
+    if(oc.indexOf("'"+q+"'") > -1) d.classList.add('active');
+  });
   var now=new Date(), from=new Date(), to=new Date();
   if(q==='today'){from=now;to=now;}
   else if(q==='yesterday'){from=new Date(now-864e5);to=new Date(now-864e5);}
@@ -336,20 +324,18 @@ function setQuick(q){
   else if(q==='all'){from=new Date('2024-01-01');to=now;}
   document.getElementById('fFrom').value=fmt(from);
   document.getElementById('fTo').value=fmt(to);
-  if(allRows.length) applyFilters(); // only filter if data already loaded
+  if(allRows.length) applyFilters();
 }
-
-// Called from onclick on chip — need to handle 'this'
-document.querySelectorAll('.dc').forEach(function(el){
-  el.addEventListener('click',function(){
-    document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
-    this.classList.add('active');
-  });
-});
 
 function fmt(d){return d.toISOString().slice(0,10);}
 
 // ── LOAD DATA FROM APPS SCRIPT ──
+function refreshToToday(){
+  // Always reset to Today when manually clicking Refresh
+  setQuick('today');
+  loadData();
+}
+
 function silentRefresh(){
   // Remember current filter state
   var fr=document.getElementById('fFrom').value;
@@ -372,9 +358,8 @@ function silentRefresh(){
         return [normDate,rawTime,r.userId,r.repName,r.area,r.party,r.station,r.lat,r.lng,r.order,r.collection,r.rating,r.remark];
       });
       populateDropdowns();
-      // Restore filters
-      document.getElementById('fFrom').value=fr;
-      document.getElementById('fTo').value=to;
+      // Silent refresh always resets to today
+      setQuick('today');
       if(rep) document.getElementById('fRep').value=rep;
       if(sta) document.getElementById('fStation').value=sta;
       if(q) document.getElementById('tsearch').value=q;
@@ -434,7 +419,8 @@ function loadData(){
       });
       console.log("Sample dates:", allRows.slice(0,3).map(function(r){return r[0];}));
       populateDropdowns();
-      applyFilters();
+      // Always apply today filter on full load and highlight Today chip
+      setQuick('today');
       document.getElementById('lastUpd').textContent = "Updated "+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
       showLoader(false);
       document.getElementById('rfBtn').disabled=false;
@@ -565,7 +551,7 @@ function fmtM(n){
 }
 
 // ── CHARTS ──
-function renderCharts(){repChart();repTimingChart();trendChart();}
+function renderCharts(){repChart();donutChart();trendChart();}
 
 function repChart(){
   var d={};
@@ -590,93 +576,27 @@ function repChart(){
 }
 
 function donutChart(){
-  // Replaced by repTimingChart — kept as empty stub for compatibility
-  repTimingChart();
-}
-
-function repTimingChart(){
-  var el = document.getElementById('repTimingChart');
-  if(!el) return;
-
-  // Build per-rep first/last visit times from displayed data
-  var repData = {};
-  displayed.forEach(function(r){
-    var nm = r[3]||'?';
-    var tm = r[1]||'';
-    if(!tm) return;
-    if(!repData[nm]) repData[nm] = {first:tm, last:tm, visits:0};
-    // Compare times as strings (HH:mm format sorts correctly)
-    if(tm < repData[nm].first) repData[nm].first = tm;
-    if(tm > repData[nm].last)  repData[nm].last  = tm;
-    repData[nm].visits++;
+  var map={best:0,good:0,avg:0,bad:0,defaulter:0};
+  var total=0;
+  displayed.forEach(function(r){var rt=(r[11]||'').toLowerCase().trim();if(map.hasOwnProperty(rt)){map[rt]++;total++;}});
+  var cols={best:'#7C3AED',good:'#16A34A',avg:'#D97706',bad:'#DC2626',defaulter:'#111'};
+  var lbls={best:'🏆 Best',good:'👍 Good',avg:'😐 Average',bad:'👎 Bad',defaulter:'🚫 Defaulter'};
+  var svg=document.getElementById('donutSvg');
+  while(svg.children.length>1)svg.removeChild(svg.lastChild);
+  var circ=2*Math.PI*36,offset=0,legHTML='';
+  Object.keys(map).forEach(function(k){
+    var cnt=map[k];if(!cnt)return;
+    var pct=cnt/Math.max(total,1),dash=pct*circ;
+    var arc=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    arc.setAttribute('cx',50);arc.setAttribute('cy',50);arc.setAttribute('r',36);
+    arc.setAttribute('fill','none');arc.setAttribute('stroke',cols[k]);arc.setAttribute('stroke-width',16);
+    arc.setAttribute('stroke-dasharray',dash+' '+(circ-dash));
+    arc.setAttribute('stroke-dashoffset',-offset);
+    arc.setAttribute('transform','rotate(-90 50 50)');
+    svg.appendChild(arc);offset+=dash;
+    legHTML+='<div class="dli"><div class="ddot" style="background:'+cols[k]+'"></div>'+lbls[k]+'<span class="dval">'+cnt+'</span></div>';
   });
-
-  var reps = Object.keys(repData);
-  if(!reps.length){
-    el.innerHTML = '<div class="empty"><div class="eico">⏰</div><div class="etxt">No visit times for this period</div></div>';
-    return;
-  }
-
-  // Sort by first visit time (earliest starter first)
-  reps.sort(function(a,b){ return repData[a].first.localeCompare(repData[b].first); });
-
-  // Find time range for scaling (use 08:00 to 20:00 as day window)
-  function timeToMinutes(t){
-    var p=t.split(':');
-    return parseInt(p[0]||0)*60+parseInt(p[1]||0);
-  }
-  var DAY_START = 8*60;   // 8:00 AM
-  var DAY_END   = 20*60;  // 8:00 PM
-  var DAY_SPAN  = DAY_END - DAY_START;
-
-  function toPct(t){
-    var m = timeToMinutes(t);
-    return Math.max(0, Math.min(100, (m - DAY_START) / DAY_SPAN * 100));
-  }
-
-  // Legend
-  var html = '<div class="rt-legend">'
-    + '<span><span class="rt-legend-dot" style="background:var(--gr)"></span>First visit</span>'
-    + '<span><span class="rt-legend-dot" style="background:var(--or)"></span>Last visit</span>'
-    + '</div>';
-
-  reps.forEach(function(nm){
-    var d = repData[nm];
-    var fp = toPct(d.first);
-    var lp = toPct(d.last);
-    var barLeft = Math.min(fp,lp);
-    var barWidth = Math.max(lp - fp, 0.5);
-    // Format time nicely
-    function fmt12(t){
-      var p=t.split(':'), h=parseInt(p[0]), m=p[1], ampm=h>=12?'pm':'am';
-      h=h%12||12;
-      return h+':'+m+ampm;
-    }
-    var sameTime = d.first === d.last;
-    html += '<div class="rt-row">'
-      + '<div class="rt-name" title="'+nm+'">'+nm.split(' ')[0]+'</div>'
-      + '<div class="rt-timeline">'
-        + '<div class="rt-track"></div>'
-        + (!sameTime ? '<div class="rt-bar" style="left:'+barLeft+'%;width:'+barWidth+'%"></div>' : '')
-        + '<div class="rt-dot-first" style="left:'+fp+'%"></div>'
-        + (!sameTime ? '<div class="rt-dot-last" style="left:'+lp+'%"></div>' : '')
-      + '</div>'
-      + '<div class="rt-times">'
-        + '<div class="rt-first">▶ '+fmt12(d.first)+'</div>'
-        + (!sameTime ? '<div class="rt-last">⏹ '+fmt12(d.last)+'</div>' : '<div class="rt-last" style="color:var(--t3)">only visit</div>')
-        + '<div class="rt-count">'+d.visits+' visit'+(d.visits>1?'s':'')+'</div>'
-      + '</div>'
-    + '</div>';
-  });
-
-  // Add time axis labels at bottom
-  html += '<div style="display:flex;justify-content:space-between;margin-top:6px;padding:0 78px 0 76px;">'
-    + ['8am','10am','12pm','2pm','4pm','6pm','8pm'].map(function(l){
-        return '<span style="font-size:9px;color:var(--t3)">'+l+'</span>';
-      }).join('')
-  + '</div>';
-
-  el.innerHTML = html;
+  document.getElementById('dlegend').innerHTML=legHTML||'<div style="color:var(--t3);font-size:12px;">No ratings yet</div>';
 }
 
 function trendChart(){
