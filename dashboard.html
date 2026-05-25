@@ -177,7 +177,7 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
   <div class="tb-right">
     <span class="tb-updated" id="lastUpd">Not loaded</span>
     <span class="tb-updated" id="nextRefresh" style="color:#FF6B00;font-size:11px;"></span>
-    <button class="btn-rf" id="rfBtn" onclick="loadData()">↺ Refresh</button>
+    <button class="btn-rf" id="rfBtn" onclick="refreshToToday()">↺ Refresh</button>
   </div>
 </div>
 
@@ -308,8 +308,13 @@ window.onload = function(){
 
 // ── QUICK DATE PRESETS ──
 function setQuick(q){
+  // Remove active from all chips
   document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
-  event && event.target && event.target.classList.add('active');
+  // Find and highlight the correct chip by matching its onclick attribute
+  document.querySelectorAll('.dc').forEach(function(d){
+    var oc = d.getAttribute('onclick') || '';
+    if(oc.indexOf("'"+q+"'") > -1) d.classList.add('active');
+  });
   var now=new Date(), from=new Date(), to=new Date();
   if(q==='today'){from=now;to=now;}
   else if(q==='yesterday'){from=new Date(now-864e5);to=new Date(now-864e5);}
@@ -319,20 +324,18 @@ function setQuick(q){
   else if(q==='all'){from=new Date('2024-01-01');to=now;}
   document.getElementById('fFrom').value=fmt(from);
   document.getElementById('fTo').value=fmt(to);
-  if(allRows.length) applyFilters(); // only filter if data already loaded
+  if(allRows.length) applyFilters();
 }
-
-// Called from onclick on chip — need to handle 'this'
-document.querySelectorAll('.dc').forEach(function(el){
-  el.addEventListener('click',function(){
-    document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
-    this.classList.add('active');
-  });
-});
 
 function fmt(d){return d.toISOString().slice(0,10);}
 
 // ── LOAD DATA FROM APPS SCRIPT ──
+function refreshToToday(){
+  // Always reset to Today when manually clicking Refresh
+  setQuick('today');
+  loadData();
+}
+
 function silentRefresh(){
   // Remember current filter state
   var fr=document.getElementById('fFrom').value;
@@ -355,9 +358,8 @@ function silentRefresh(){
         return [normDate,rawTime,r.userId,r.repName,r.area,r.party,r.station,r.lat,r.lng,r.order,r.collection,r.rating,r.remark];
       });
       populateDropdowns();
-      // Restore filters
-      document.getElementById('fFrom').value=fr;
-      document.getElementById('fTo').value=to;
+      // Silent refresh always resets to today
+      setQuick('today');
       if(rep) document.getElementById('fRep').value=rep;
       if(sta) document.getElementById('fStation').value=sta;
       if(q) document.getElementById('tsearch').value=q;
@@ -417,7 +419,8 @@ function loadData(){
       });
       console.log("Sample dates:", allRows.slice(0,3).map(function(r){return r[0];}));
       populateDropdowns();
-      applyFilters();
+      // Always apply today filter on full load and highlight Today chip
+      setQuick('today');
       document.getElementById('lastUpd').textContent = "Updated "+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
       showLoader(false);
       document.getElementById('rfBtn').disabled=false;
