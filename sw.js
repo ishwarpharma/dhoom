@@ -1,7 +1,7 @@
 // DHOOM SERVICE WORKER — Auto-update on every GitHub push
 // Version is set to current timestamp at build time; GitHub Actions or manual edit triggers refresh
 
-const CACHE_VERSION = "dhoom-v2";
+const CACHE_VERSION = "dhoom-v3";
 const CACHE_ASSETS = [
   "./",
   "./index.html",
