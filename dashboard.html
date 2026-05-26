@@ -214,9 +214,11 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
         </select>
       </div>
       <div class="fg">
-        <div class="fl">Station</div>
-        <select class="fi" id="fStation">
-          <option value="">All Stations</option>
+        <div class="fl">Rating Group</div>
+        <select class="fi" id="fRatingGroup" onchange="applyFilters()">
+          <option value="">All Ratings</option>
+          <option value="positive">⭐ Positive (Best + Good)</option>
+          <option value="negative">⚠️ Needs Attention (Avg + Bad + Defaulter)</option>
         </select>
       </div>
       <div class="factions">
@@ -254,7 +256,7 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
   <div class="tcard">
     <div class="thead-bar">
       <div><div class="ttitle">Visit Records</div><div class="tcount" id="tcount">—</div></div>
-      <input type="text" class="tsearch" id="tsearch" placeholder="Search party, rep, station..." oninput="onSearch()">
+      <input type="text" class="tsearch" id="tsearch" placeholder="Search party, rep, remark..." oninput="onSearch()">
     </div>
     <div class="twrap">
       <table>
@@ -341,7 +343,7 @@ function silentRefresh(){
   var fr=document.getElementById('fFrom').value;
   var to=document.getElementById('fTo').value;
   var rep=document.getElementById('fRep').value;
-  var sta=document.getElementById('fStation').value;
+  var ratingGroup=document.getElementById('fRatingGroup').value;
   var q=document.getElementById('tsearch').value;
   var url = SCRIPT_URL + "?action=all&cb=" + Date.now();
   fetch(url)
@@ -361,7 +363,7 @@ function silentRefresh(){
       // Silent refresh always resets to today
       setQuick('today');
       if(rep) document.getElementById('fRep').value=rep;
-      if(sta) document.getElementById('fStation').value=sta;
+      if(ratingGroup) document.getElementById('fRatingGroup').value=ratingGroup;
       if(q) document.getElementById('tsearch').value=q;
       applyFilters();
       document.getElementById('lastUpd').textContent="Auto-updated "+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
@@ -440,10 +442,9 @@ function showError(msg){
 
 // ── DROPDOWNS ──
 function populateDropdowns(){
-  var reps={},stations={};
-  allRows.forEach(function(r){if(r[3])reps[r[3]]=1;if(r[6])stations[r[6]]=1;});
+  var reps={};
+  allRows.forEach(function(r){if(r[3])reps[r[3]]=1;});
   fill('fRep',Object.keys(reps).sort(),'All Reps');
-  fill('fStation',Object.keys(stations).sort(),'All Stations');
 }
 
 function fill(id,vals,ph){
@@ -457,12 +458,16 @@ function applyFilters(){
   var fr=document.getElementById('fFrom').value;
   var to=document.getElementById('fTo').value;
   var rep=document.getElementById('fRep').value;
-  var sta=document.getElementById('fStation').value;
+  var ratingGroup=document.getElementById('fRatingGroup').value;
   filtered=allRows.filter(function(r){
     if(fr&&r[0]<fr)return false;
     if(to&&r[0]>to)return false;
     if(rep&&r[3]!==rep)return false;
-    if(sta&&r[6]!==sta)return false;
+    if(ratingGroup){
+      var rt=(r[11]||'').toLowerCase().trim();
+      if(ratingGroup==='positive' && rt!=='best' && rt!=='good') return false;
+      if(ratingGroup==='negative' && rt!=='avg' && rt!=='bad' && rt!=='defaulter') return false;
+    }
     return true;
   });
   pg=1;
@@ -471,7 +476,7 @@ function applyFilters(){
 
 function clearFilters(){
   document.getElementById('fRep').value='';
-  document.getElementById('fStation').value='';
+  document.getElementById('fRatingGroup').value='';
   document.getElementById('tsearch').value='';
   document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
   document.getElementById('dc-month').classList.add('active');
