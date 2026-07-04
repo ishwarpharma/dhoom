@@ -62,7 +62,14 @@
     "area": "ALL",
     "manager": "admin"
   },
-{
+ {
+    "id": "Narendra",
+    "name": "Narendra Singh",
+    "pin": "83798337",
+    "area": "ALL",
+    "manager": "admin"
+  },
+  {
     "id": "Vaishnavi",
     "name": "Vaishnavi",
     "pin": "80977482",
