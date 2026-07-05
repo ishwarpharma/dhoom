@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dhoom Dashboard — Ishwar Pharma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --or:#FF6B00;--or2:#FF9F45;--orl:#FFF3E8;
+  --bl:#2563EB;--bll:#DBEAFE;
+  --gr:#16A34A;--grl:#DCFCE7;
+  --rd:#DC2626;--rdl:#FEE2E2;
+  --am:#D97706;--aml:#FEF3C7;
+  --pu:#7C3AED;--pul:#EDE9FE;
+  --bg:#F8F7F4;--card:#fff;
+  --text:#111;--t2:#555;--t3:#999;
+  --border:#E8E6E0;
+  --fh:'Rajdhani',sans-serif;
+  --fb:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:var(--fb);color:var(--text);min-height:100vh;}
+
+/* TOP BAR */
+.topbar{background:#111;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--or);}
+.tb-brand{display:flex;align-items:center;gap:10px;}
+.tb-logo{width:32px;height:32px;}
+.tb-name{font-family:var(--fh);font-size:22px;font-weight:700;letter-spacing:4px;color:#fff;}
+.tb-sub{font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-left:2px;}
+.tb-right{display:flex;align-items:center;gap:12px;}
+.tb-updated{font-size:12px;color:#666;}
+.btn-rf{background:var(--or);border:none;color:#fff;padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);transition:opacity 0.2s;}
+.btn-rf:hover{opacity:0.85;}
+.btn-rf:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* PAGE */
+.page{max-width:1440px;margin:0 auto;padding:24px 20px;}
+
+/* FILTER BAR */
+.fbar{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:20px;border:1px solid var(--border);box-shadow:0 1px 6px rgba(0,0,0,0.05);}
+.fbar-top{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:10px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fl{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em;}
+.fi{padding:8px 11px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;color:var(--text);font-family:var(--fb);outline:none;transition:border-color 0.2s;min-width:130px;}
+.fi:focus{border-color:var(--or);}
+/* Quick date chips */
+.date-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.dc{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;color:var(--t2);transition:all 0.15s;font-family:var(--fb);}
+.dc:hover,.dc.active{background:var(--or);border-color:var(--or);color:#fff;}
+/* Filter action buttons */
+.factions{display:flex;gap:8px;align-items:flex-end;}
+.btn-apply{background:var(--or);border:none;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);height:36px;}
+.btn-clear{background:var(--bg);border:1.5px solid var(--border);color:var(--t2);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);height:36px;}
+
+/* KPI ROW */
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.kpi{background:var(--card);border-radius:13px;padding:18px 16px;border:1px solid var(--border);position:relative;overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,0.04);transition:transform 0.18s;}
+.kpi:hover{transform:translateY(-2px);}
+.kpi-stripe{position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi-ico{font-size:20px;margin-bottom:7px;}
+.kpi-val{font-family:var(--fh);font-size:26px;font-weight:700;line-height:1;}
+.kpi-lbl{font-size:12px;color:var(--t3);margin-top:4px;font-weight:500;}
+.kpi-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+
+/* CHARTS */
+.crow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;}
+.cc{background:var(--card);border-radius:13px;padding:18px;border:1px solid var(--border);box-shadow:0 1px 5px rgba(0,0,0,0.04);}
+.ct{font-family:var(--fh);font-size:15px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px;}
+.cs{font-size:11px;color:var(--t3);margin-bottom:14px;}
+
+/* BAR CHART */
+.bar-chart{display:flex;flex-direction:column;gap:7px;}
+.brow{display:flex;align-items:center;gap:8px;}
+.blbl{font-size:12px;color:var(--t2);width:75px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;}
+.btrack{flex:1;background:var(--bg);border-radius:4px;height:20px;overflow:hidden;}
+.bfill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:7px;font-size:11px;font-weight:600;color:#fff;white-space:nowrap;transition:width 0.7s ease;}
+.bval{font-size:12px;color:var(--t2);width:65px;flex-shrink:0;font-weight:600;}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:16px;}
+.dlegend{display:flex;flex-direction:column;gap:7px;flex:1;}
+.dli{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--t2);}
+.ddot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.dval{font-weight:700;color:var(--text);margin-left:auto;}
+
+/* TREND */
+.trend-wrap{height:130px;}
+.trend-svg{width:100%;height:100%;}
+
+/* EXPORT ROW */
+.erow{display:flex;gap:8px;margin-bottom:18px;}
+.btn-exp{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);color:var(--t2);transition:all 0.15s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.btn-exp:hover{border-color:var(--or);color:var(--or);}
+
+/* TABLE */
+.tcard{background:var(--card);border-radius:13px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,0.04);margin-bottom:20px;}
+.thead-bar{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.ttitle{font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:0.5px;}
+.tcount{font-size:12px;color:var(--t3);}
+.tsearch{padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;font-family:var(--fb);outline:none;width:220px;}
+.tsearch:focus{border-color:var(--or);}
+.twrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{background:#FAFAF8;padding:10px 13px;text-align:left;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+thead th:hover{color:var(--or);}
+thead th.srt{color:var(--or);}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#FFFAF5;}
+tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
+
+/* MAP LINK */
+.map-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;background:var(--bll);color:var(--bl);font-size:11px;font-weight:700;text-decoration:none;border:1px solid #bfdbfe;transition:all 0.15s;}
+.map-btn:hover{background:var(--bl);color:#fff;}
+.no-geo{font-size:11px;color:var(--t3);}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.b-best{background:var(--pul);color:var(--pu);}
+.b-good{background:var(--grl);color:var(--gr);}
+.b-avg{background:var(--aml);color:var(--am);}
+.b-bad{background:var(--rdl);color:var(--rd);}
+.b-defaulter{background:#111;color:#fff;}
+
+/* PAGINATION */
+.pag{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-top:1px solid var(--border);}
+.pinfo{font-size:12px;color:var(--t3);}
+.pbtns{display:flex;gap:5px;}
+.pb{padding:5px 11px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fb);}
+.pb:hover{border-color:var(--or);color:var(--or);}
+.pb.act{background:var(--or);border-color:var(--or);color:#fff;}
+.pb:disabled{opacity:0.35;cursor:not-allowed;}
+
+/* LOADER */
+#loader{display:none;position:fixed;inset:0;background:rgba(248,247,244,0.88);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(3px);}
+#loader.show{display:flex;}
+.spin{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--or);border-radius:50%;animation:sp 0.7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.ltxt{font-family:var(--fh);font-size:15px;font-weight:600;color:var(--t2);letter-spacing:2px;text-transform:uppercase;}
+
+/* ERROR BANNER */
+.errbanner{display:none;background:var(--rdl);border:1px solid #fca5a5;color:var(--rd);padding:12px 18px;border-radius:10px;margin-bottom:16px;font-size:13px;font-weight:600;}
+.errbanner.show{display:block;}
+
+/* EMPTY */
+.empty{text-align:center;padding:36px;color:var(--t3);}
+.eico{font-size:32px;margin-bottom:8px;}
+.etxt{font-size:14px;font-weight:500;}
+
+@media(max-width:900px){.crow{grid-template-columns:1fr;}.topbar{padding:0 14px;}.page{padding:14px;}}
+@media(max-width:600px){.krow{grid-template-columns:1fr 1fr;}.tb-sub{display:none;}}
+
+/* NEARBY PARTIES */
+.nearby-wrap{margin-top:5px;}
+.nearby-chip{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:#FFF0E6;color:#CC4400;border:1px solid #FFD4B0;margin:2px 3px 2px 0;cursor:default;}
+.nearby-chip:first-child{margin-left:0;}
+.nearby-label{font-size:10px;color:#9CA3AF;font-weight:600;display:block;margin-bottom:3px;}
+.nearby-same{background:#FEE2E2;color:#991B1B;border-color:#FECACA;}
+.nearby-ok{background:#DCFCE7;color:#166534;border-color:#BBF7D0;}
+
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="spin"></div><div class="ltxt">Loading...</div></div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-brand">
+    <svg class="tb-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <rect width="512" height="512" rx="80" fill="#FF6B00"/>
+      <circle cx="160" cy="340" r="65" fill="none" stroke="#fff" stroke-width="18"/>
+      <circle cx="160" cy="340" r="7" fill="#fff"/>
+      <circle cx="368" cy="340" r="60" fill="none" stroke="#fff" stroke-width="18"/>
+      <circle cx="368" cy="340" r="7" fill="#fff"/>
+      <path d="M160 340 L210 225 L300 205 L368 275 L368 340" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M210 225 Q258 195 318 210 L300 205 L210 225Z" fill="#FFD4B0"/>
+    </svg>
+    <div>
+      <span class="tb-name">DHOOM</span>
+      <span class="tb-sub">Ishwar Pharma · Dashboard</span>
+    </div>
+  </div>
+  <div class="tb-right">
+    <span class="tb-updated" id="lastUpd">Not loaded</span>
+    <span class="tb-updated" id="nextRefresh" style="color:#FF6B00;font-size:11px;"></span>
+    <button class="btn-rf" id="rfBtn" onclick="refreshToToday()">↺ Refresh</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="errbanner" id="errBanner"></div>
+
+  <!-- FILTER BAR -->
+  <div class="fbar">
+    <!-- Quick date chips -->
+    <div class="date-chips" style="margin-bottom:10px;">
+      <div class="fl" style="align-self:center;margin-right:4px;">Quick:</div>
+      <div class="dc active" id="dc-today" onclick="setQuick('today')">📅 Today</div>
+      <div class="dc" onclick="setQuick('yesterday')">⏮ Yesterday</div>
+      <div class="dc" onclick="setQuick('week')">📆 This Week</div>
+      <div class="dc" onclick="setQuick('month')" id="dc-month">📅 This Month</div>
+      <div class="dc" onclick="setQuick('last30')">🗓 Last 30 Days</div>
+      <div class="dc" id="dc-all" onclick="setQuick('all')">♾ All Time</div>
+    </div>
+    <!-- Custom date + rep filter -->
+    <div class="fbar-top">
+      <div class="fg">
+        <div class="fl">From Date</div>
+        <input type="date" class="fi" id="fFrom">
+      </div>
+      <div class="fg">
+        <div class="fl">To Date</div>
+        <input type="date" class="fi" id="fTo">
+      </div>
+      <div class="fg">
+        <div class="fl">Rep Name</div>
+        <select class="fi" id="fRep">
+          <option value="">All Reps</option>
+        </select>
+      </div>
+      <div class="fg">
+        <div class="fl">Rating Group</div>
+        <select class="fi" id="fRatingGroup" onchange="applyFilters()">
+          <option value="">All Ratings</option>
+          <option value="positive">⭐ Positive (Best + Good)</option>
+          <option value="negative">⚠️ Needs Attention (Avg + Bad + Defaulter)</option>
+        </select>
+      </div>
+      <div class="factions">
+        <button class="btn-apply" onclick="applyFilters()">Apply</button>
+        <button class="btn-clear" onclick="clearFilters()">✕ Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI ROW -->
+  <div class="krow">
+    <div class="kpi"><div class="kpi-stripe" style="background:var(--or)"></div><div class="kpi-ico">🏍️</div><div class="kpi-val" id="kV">—</div><div class="kpi-lbl">Total Visits</div><div class="kpi-sub" id="kVs"></div></div>
+    <div class="kpi"><div class="kpi-stripe" style="background:var(--bl)"></div><div class="kpi-ico">📦</div><div class="kpi-val" id="kO">—</div><div class="kpi-lbl">Total Orders (₹)</div><div class="kpi-sub" id="kOs"></div></div>
+    <div class="kpi"><div class="kpi-stripe" style="background:var(--gr)"></div><div class="kpi-ico">💰</div><div class="kpi-val" id="kC">—</div><div class="kpi-lbl">Collection (₹)</div><div class="kpi-sub" id="kCs"></div></div>
+    <div class="kpi"><div class="kpi-stripe" style="background:var(--pu)"></div><div class="kpi-ico">👥</div><div class="kpi-val" id="kR">—</div><div class="kpi-lbl">Active Reps</div></div>
+    <div class="kpi"><div class="kpi-stripe" style="background:var(--am)"></div><div class="kpi-ico">🏪</div><div class="kpi-val" id="kP">—</div><div class="kpi-lbl">Unique Parties</div></div>
+    <div class="kpi"><div class="kpi-stripe" style="background:var(--rd)"></div><div class="kpi-ico">📊</div><div class="kpi-val" id="kA">—</div><div class="kpi-lbl">Avg Order/Visit</div></div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="crow">
+    <div class="cc"><div class="ct">Rep Performance</div><div class="cs">Visits per rep (P = unique parties)</div><div class="bar-chart" id="repChart"></div></div>
+    <div class="cc"><div class="ct">Party Ratings</div><div class="cs">Distribution of ratings given</div><div class="donut-wrap"><svg id="donutSvg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="36" fill="none" stroke="#eee" stroke-width="16"/></svg><div class="dlegend" id="dlegend"></div></div></div>
+    <div class="cc"><div class="ct">Daily Trend</div><div class="cs">Visits per day</div><div class="trend-wrap"><svg class="trend-svg" id="trendSvg" viewBox="0 0 300 110" preserveAspectRatio="none"></svg></div></div>
+  </div>
+
+  <!-- EXPORTS -->
+  <div class="erow">
+    <button class="btn-exp" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="btn-exp" onclick="window.print()">🖨 Print</button>
+    <a class="btn-exp" href="https://docs.google.com/spreadsheets/d/1kisXe0RlzlVBlzL6qTZOgm_A9OUUE0Yid7a70MCIfYE/edit" target="_blank">📊 Google Sheet</a>
+  </div>
+
+  <!-- TABLE -->
+  <div class="tcard">
+    <div class="thead-bar">
+      <div><div class="ttitle">Visit Records</div><div class="tcount" id="tcount">—</div></div>
+      <input type="text" class="tsearch" id="tsearch" placeholder="Search party, rep, remark..." oninput="onSearch()">
+    </div>
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy(0)">Date ↕</th>
+            <th onclick="sortBy(1)">Time ↕</th>
+            <th onclick="sortBy(3)">Rep ↕</th>
+            <th onclick="sortBy(5)">Party ↕</th>
+            <th onclick="sortBy(6)">Station ↕</th>
+            <th onclick="sortBy(9)">Order ₹ ↕</th>
+            <th onclick="sortBy(10)">Collection ₹ ↕</th>
+            <th onclick="sortBy(11)">Rating ↕</th>
+            <th>Location</th>
+            <th>Remark</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="pag"><div class="pinfo" id="pinfo">—</div><div class="pbtns" id="pbtns"></div></div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════
+// CONFIG — paste your script URL
+// ════════════════════════════════
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysz5L-MOu0T6IH-c9CmRzCRpE6DoUynVvBhhfSALPmv8_Za5XX1910kW8HD4TJz6bdUA/exec";
+
+// ── NEARBY PARTY LOOKUP ──
+var NEARBY_RADIUS = 100; // metres — parties within this radius flagged
+
+function haversineM(lat1,lon1,lat2,lon2){
+  if(!lat1||!lon1||!lat2||!lon2) return 99999;
+  var R=6371000;
+  var dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+
+        Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+        Math.sin(dLon/2)*Math.sin(dLon/2);
+  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+
+// Build a compact location index from ALL rows (not just filtered)
+// Returns: { "PartyName": {lat, lng, count} }
+function buildLocationIndex(){
+  var index = {};
+  allRows.forEach(function(r){
+    var party = (r[5]||'').trim();
+    var lat   = parseFloat(r[7]);
+    var lng   = parseFloat(r[8]);
+    if(!party || isNaN(lat) || isNaN(lng)) return;
+    if(!index[party]){
+      index[party] = {lat:lat, lng:lng, count:0, lats:[], lngs:[]};
+    }
+    index[party].count++;
+    index[party].lats.push(lat);
+    index[party].lngs.push(lng);
+  });
+  // Use median lat/lng per party for stability
+  Object.keys(index).forEach(function(k){
+    var d = index[k];
+    d.lats.sort(function(a,b){return a-b;});
+    d.lngs.sort(function(a,b){return a-b;});
+    var mid = Math.floor(d.lats.length/2);
+    d.lat = d.lats[mid];
+    d.lng = d.lngs[mid];
+  });
+  return index;
+}
+
+// For a given row, find other party names within NEARBY_RADIUS metres
+function getNearbyParties(row, locIndex){
+  var thisParty = (row[5]||'').trim();
+  var thisLat   = parseFloat(row[7]);
+  var thisLng   = parseFloat(row[8]);
+  if(isNaN(thisLat)||isNaN(thisLng)) return [];
+
+  var nearby = [];
+  Object.keys(locIndex).forEach(function(party){
+    if(party === thisParty) return; // skip self
+    var d = haversineM(thisLat, thisLng, locIndex[party].lat, locIndex[party].lng);
+    if(d <= NEARBY_RADIUS){
+      nearby.push({name:party, dist:d, count:locIndex[party].count});
+    }
+  });
+  // Sort closest first
+  nearby.sort(function(a,b){return a.dist-b.dist;});
+  return nearby;
+}
+// ════════════════════════════════
+
+var allRows=[], filtered=[], displayed=[];
+var sortCol=0, sortAsc=false, pg=1, perPg=30, autoRefreshActive=true;
+
+window.onload = function(){
+  setQuick('today');
+  loadData();
+  // Auto-refresh every 5 minutes
+  setInterval(function(){ silentRefresh(); }, 5 * 60 * 1000);
+  // Countdown display
+  var countdown = 300;
+  setInterval(function(){
+    countdown--;
+    if(countdown <= 0){ countdown = 300; }
+    var m = Math.floor(countdown/60), s = countdown%60;
+    var el = document.getElementById('nextRefresh');
+    if(el) el.textContent = '↺ in ' + m + ':' + (s<10?'0':'')+s;
+  }, 1000);
+};
+
+// ── QUICK DATE PRESETS ──
+function setQuick(q){
+  // Remove active from all chips
+  document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
+  // Find and highlight the correct chip by matching its onclick attribute
+  document.querySelectorAll('.dc').forEach(function(d){
+    var oc = d.getAttribute('onclick') || '';
+    if(oc.indexOf("'"+q+"'") > -1) d.classList.add('active');
+  });
+  var now=new Date(), from=new Date(), to=new Date();
+  if(q==='today'){from=now;to=now;}
+  else if(q==='yesterday'){from=new Date(now-864e5);to=new Date(now-864e5);}
+  else if(q==='week'){var d=now.getDay()||7;from=new Date(now-(d-1)*864e5);to=now;}
+  else if(q==='month'){from=new Date(now.getFullYear(),now.getMonth(),1);to=now;}
+  else if(q==='last30'){from=new Date(now-30*864e5);to=now;}
+  else if(q==='all'){from=new Date('2024-01-01');to=now;}
+  document.getElementById('fFrom').value=fmt(from);
+  document.getElementById('fTo').value=fmt(to);
+  if(allRows.length) applyFilters();
+}
+
+function fmt(d){return d.toISOString().slice(0,10);}
+
+// ── LOAD DATA FROM APPS SCRIPT ──
+function refreshToToday(){
+  // Always reset to Today when manually clicking Refresh
+  setQuick('today');
+  loadData();
+}
+
+function silentRefresh(){
+  // Remember current filter state
+  var fr=document.getElementById('fFrom').value;
+  var to=document.getElementById('fTo').value;
+  var rep=document.getElementById('fRep').value;
+  var ratingGroup=document.getElementById('fRatingGroup').value;
+  var q=document.getElementById('tsearch').value;
+  var url = SCRIPT_URL + "?action=all&cb=" + Date.now();
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.success) return;
+      allRows = (data.rows||[]).map(function(r){
+        var rawDate = String(r.date||'');
+        var normDate = rawDate;
+        if(rawDate.length>10 && rawDate.indexOf('-')===-1){var d=new Date(rawDate);if(!isNaN(d.getTime()))normDate=fmt(d);}
+        if(rawDate.indexOf('/')>-1){var parts=rawDate.split('/');if(parts.length===3)normDate=parts[2]+'-'+parts[1].padStart(2,'0')+'-'+parts[0].padStart(2,'0');}
+        var rawTime=String(r.time||'');
+        if(rawTime.length>8){var td=new Date(rawTime);if(!isNaN(td.getTime()))rawTime=td.getHours().toString().padStart(2,'0')+':'+td.getMinutes().toString().padStart(2,'0');}
+        return [normDate,rawTime,r.userId,r.repName,r.area,r.party,r.station,r.lat,r.lng,r.order,r.collection,r.rating,r.remark];
+      });
+      populateDropdowns();
+      // Silent refresh always resets to today
+      window._locIndex = buildLocationIndex();
+      setQuick('today');
+      if(rep) document.getElementById('fRep').value=rep;
+      if(ratingGroup) document.getElementById('fRatingGroup').value=ratingGroup;
+      if(q) document.getElementById('tsearch').value=q;
+      applyFilters();
+      document.getElementById('lastUpd').textContent="Auto-updated "+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      // Show subtle pulse on the refresh button
+      var btn=document.getElementById('rfBtn');
+      btn.textContent='✓ Refreshed';
+      setTimeout(function(){btn.textContent='↺ Refresh';},2000);
+    }).catch(function(e){console.log('Silent refresh failed:',e);});
+}
+
+function loadData(){
+  showLoader(true);
+  document.getElementById('rfBtn').disabled=true;
+  document.getElementById('errBanner').classList.remove('show');
+  var url = SCRIPT_URL + "?action=all&cb=" + Date.now();
+  fetch(url)
+    .then(function(r){
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return r.json();
+    })
+    .then(function(data){
+      if(!data.success) throw new Error(data.error||"Script returned error");
+      // Convert object rows to arrays for sorting/indexing
+      allRows = (data.rows||[]).map(function(r){
+        // Normalize date — sheet may return Date object stringified in various formats
+        var rawDate = String(r.date||'');
+        var normDate = rawDate;
+        // Handle "Fri May 23 2026..." format
+        if (rawDate.length > 10 && rawDate.indexOf('-') === -1) {
+          var d = new Date(rawDate);
+          if (!isNaN(d.getTime())) normDate = fmt(d);
+        }
+        // Handle "23/05/2026" format
+        if (rawDate.indexOf('/') > -1) {
+          var parts = rawDate.split('/');
+          if (parts.length === 3) {
+            // could be dd/mm/yyyy or mm/dd/yyyy — assume dd/mm/yyyy (Indian)
+            normDate = parts[2] + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0');
+          }
+        }
+        // Handle Excel serial date number (e.g. 45800)
+        if (!isNaN(Number(rawDate)) && Number(rawDate) > 40000) {
+          var d = new Date((Number(rawDate) - 25569) * 86400000);
+          normDate = fmt(d);
+        }
+        var rawTime = String(r.time||'');
+        // Normalize time — may come as full date string
+        if (rawTime.length > 8) {
+          var td = new Date(rawTime);
+          if (!isNaN(td.getTime())) {
+            rawTime = td.getHours().toString().padStart(2,'0') + ':' + td.getMinutes().toString().padStart(2,'0');
+          }
+        }
+        return [normDate, rawTime, r.userId, r.repName, r.area, r.party, r.station, r.lat, r.lng, r.order, r.collection, r.rating, r.remark];
+      });
+      console.log("Sample dates:", allRows.slice(0,3).map(function(r){return r[0];}));
+      populateDropdowns();
+      window._locIndex = buildLocationIndex();
+      // Always apply today filter on full load and highlight Today chip
+      setQuick('today');
+      document.getElementById('lastUpd').textContent = "Updated "+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      showLoader(false);
+      document.getElementById('rfBtn').disabled=false;
+    })
+    .catch(function(err){
+      showLoader(false);
+      document.getElementById('rfBtn').disabled=false;
+      showError("Could not connect to Google Sheet. Make sure Apps Script is deployed with 'Anyone' access. Error: "+err.message);
+    });
+}
+
+function showError(msg){
+  var b=document.getElementById('errBanner');
+  b.textContent="⚠️ "+msg;
+  b.classList.add('show');
+}
+
+// ── DROPDOWNS ──
+function populateDropdowns(){
+  var reps={};
+  allRows.forEach(function(r){if(r[3])reps[r[3]]=1;});
+  fill('fRep',Object.keys(reps).sort(),'All Reps');
+}
+
+function fill(id,vals,ph){
+  var sel=document.getElementById(id),cur=sel.value;
+  sel.innerHTML='<option value="">'+ph+'</option>';
+  vals.forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;if(v===cur)o.selected=true;sel.appendChild(o);});
+}
+
+// ── FILTERS ──
+function applyFilters(){
+  var fr=document.getElementById('fFrom').value;
+  var to=document.getElementById('fTo').value;
+  var rep=document.getElementById('fRep').value;
+  var ratingGroup=document.getElementById('fRatingGroup').value;
+  filtered=allRows.filter(function(r){
+    if(fr&&r[0]<fr)return false;
+    if(to&&r[0]>to)return false;
+    if(rep&&r[3]!==rep)return false;
+    if(ratingGroup){
+      var rt=(r[11]||'').toLowerCase().trim();
+      if(ratingGroup==='positive' && rt!=='best' && rt!=='good') return false;
+      if(ratingGroup==='negative' && rt!=='avg' && rt!=='bad' && rt!=='defaulter') return false;
+    }
+    return true;
+  });
+  pg=1;
+  onSearch();
+}
+
+function clearFilters(){
+  document.getElementById('fRep').value='';
+  document.getElementById('fRatingGroup').value='';
+  document.getElementById('tsearch').value='';
+  document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
+  document.getElementById('dc-month').classList.add('active');
+  setQuick('month');
+}
+
+// ── SEARCH ──
+function onSearch(){
+  var q=(document.getElementById('tsearch').value||'').toLowerCase().trim();
+  displayed=!q?filtered.slice():filtered.filter(function(r){
+    return[r[3],r[5],r[6],r[11],r[12]].some(function(v){return(v||'').toLowerCase().indexOf(q)>-1;});
+  });
+  // Default: newest first (date desc, time desc)
+  if(sortCol===0 && !sortAsc){
+    displayed.sort(function(a,b){
+      var dc=String(b[0]||'').localeCompare(String(a[0]||''));
+      if(dc!==0)return dc;
+      return String(b[1]||'').localeCompare(String(a[1]||''));
+    });
+  } else {
+    sortData();
+  }
+  pg=1;renderAll();
+}
+
+// ── SORT ──
+function sortBy(c){
+  sortCol===c?sortAsc=!sortAsc:(sortCol=c,sortAsc=false);
+  sortData();renderTable();
+}
+function sortData(){
+  var c=sortCol;
+  displayed.sort(function(a,b){
+    var av=a[c]||'',bv=b[c]||'';
+    if(c===9||c===10){av=Number(av)||0;bv=Number(bv)||0;return sortAsc?av-bv:bv-av;}
+    // For date column, also sort by time as secondary key
+    if(c===0){
+      var cmp=String(bv).localeCompare(String(av)); // newest date first by default
+      if(!sortAsc) return cmp;
+      cmp=String(av).localeCompare(String(bv));
+      if(cmp!==0) return cmp;
+      return String(a[1]||'').localeCompare(String(b[1]||''));
+    }
+    return sortAsc?String(av).localeCompare(String(bv)):String(bv).localeCompare(String(av));
+  });
+}
+
+// ── RENDER ALL ──
+function renderAll(){updateKPIs();renderCharts();renderTable();}
+
+// ── KPIs ──
+function updateKPIs(){
+  var n=displayed.length;
+  var o=displayed.reduce(function(s,r){return s+(Number(r[9])||0);},0);
+  var c=displayed.reduce(function(s,r){return s+(Number(r[10])||0);},0);
+  var reps=new Set(displayed.map(function(r){return r[3];})).size;
+  var parties=new Set(displayed.map(function(r){return r[5];})).size;
+  var avg=n?Math.round(o/n):0;
+  document.getElementById('kV').textContent=n.toLocaleString('en-IN');
+  document.getElementById('kO').textContent=fmtM(o);
+  document.getElementById('kC').textContent=fmtM(c);
+  document.getElementById('kR').textContent=reps;
+  document.getElementById('kP').textContent=parties;
+  document.getElementById('kA').textContent=fmtM(avg);
+  var td=fmt(new Date());
+  document.getElementById('kVs').textContent=displayed.filter(function(r){return r[0]===td;}).length+' today';
+  document.getElementById('kOs').textContent='Avg ₹'+avg.toLocaleString('en-IN')+'/visit';
+  document.getElementById('kCs').textContent=(o?Math.round(c/o*100):0)+'% of orders collected';
+}
+
+function fmtM(n){
+  n=Number(n)||0;
+  if(n>=10000000)return '₹'+(n/10000000).toFixed(1)+'Cr';
+  if(n>=100000)return '₹'+(n/100000).toFixed(1)+'L';
+  if(n>=1000)return '₹'+(n/1000).toFixed(1)+'K';
+  return '₹'+n.toLocaleString('en-IN');
+}
+
+// ── CHARTS ──
+function renderCharts(){repChart();donutChart();trendChart();}
+
+function repChart(){
+  var d={};
+  displayed.forEach(function(r){
+    var nm=r[3]||'?';
+    if(!d[nm])d[nm]={visits:0,parties:new Set()};
+    d[nm].visits++;
+    if(r[5]) d[nm].parties.add(r[5]);
+  });
+  // Sort by number of visits descending
+  var sorted=Object.entries(d).sort(function(a,b){return b[1].visits-a[1].visits;}).slice(0,8);
+  var max=sorted.length?sorted[0][1].visits:1;
+  var cols=['#FF6B00','#2563EB','#16A34A','#7C3AED','#D97706','#DC2626','#0891B2','#BE185D'];
+  var html=sorted.map(function(e,i){
+    var pct=max>0?Math.max(2,e[1].visits/max*100):2;
+    var uniqueP=e[1].parties.size;
+    return '<div class="brow"><div class="blbl" title="'+e[0]+'">'+e[0].split(' ')[0]+'</div>'+
+      '<div class="btrack"><div class="bfill" style="width:'+pct+'%;background:'+cols[i%8]+'">'+(pct>18?e[1].visits+' visits':'')+'</div></div>'+
+      '<div class="bval" title="'+uniqueP+' unique parties">'+e[1].visits+' <span style="color:var(--t3);font-size:10px;">('+uniqueP+'P)</span></div></div>';
+  }).join('');
+  document.getElementById('repChart').innerHTML=html||'<div class="empty"><div class="etxt">No data</div></div>';
+}
+
+function donutChart(){
+  var map={best:0,good:0,avg:0,bad:0,defaulter:0};
+  var total=0;
+  displayed.forEach(function(r){var rt=(r[11]||'').toLowerCase().trim();if(map.hasOwnProperty(rt)){map[rt]++;total++;}});
+  var cols={best:'#7C3AED',good:'#16A34A',avg:'#D97706',bad:'#DC2626',defaulter:'#111'};
+  var lbls={best:'🏆 Best',good:'👍 Good',avg:'😐 Average',bad:'👎 Bad',defaulter:'🚫 Defaulter'};
+  var svg=document.getElementById('donutSvg');
+  while(svg.children.length>1)svg.removeChild(svg.lastChild);
+  var circ=2*Math.PI*36,offset=0,legHTML='';
+  Object.keys(map).forEach(function(k){
+    var cnt=map[k];if(!cnt)return;
+    var pct=cnt/Math.max(total,1),dash=pct*circ;
+    var arc=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    arc.setAttribute('cx',50);arc.setAttribute('cy',50);arc.setAttribute('r',36);
+    arc.setAttribute('fill','none');arc.setAttribute('stroke',cols[k]);arc.setAttribute('stroke-width',16);
+    arc.setAttribute('stroke-dasharray',dash+' '+(circ-dash));
+    arc.setAttribute('stroke-dashoffset',-offset);
+    arc.setAttribute('transform','rotate(-90 50 50)');
+    svg.appendChild(arc);offset+=dash;
+    legHTML+='<div class="dli"><div class="ddot" style="background:'+cols[k]+'"></div>'+lbls[k]+'<span class="dval">'+cnt+'</span></div>';
+  });
+  document.getElementById('dlegend').innerHTML=legHTML||'<div style="color:var(--t3);font-size:12px;">No ratings yet</div>';
+}
+
+function trendChart(){
+  var dm={};
+  displayed.forEach(function(r){var d=r[0]||'?';dm[d]=(dm[d]||0)+1;});
+  var dates=Object.keys(dm).sort(),counts=dates.map(function(d){return dm[d];});
+  var svg=document.getElementById('trendSvg');svg.innerHTML='';
+  if(dates.length<2){svg.innerHTML='<text x="150" y="60" text-anchor="middle" fill="#999" font-size="11" font-family="DM Sans">Need more data for trend</text>';return;}
+  var W=300,H=110,px2=10,py2=14,maxV=Math.max.apply(null,counts);
+  function px(i){return px2+(i/(dates.length-1))*(W-2*px2);}
+  function py(v){return H-py2-((v/(maxV||1))*(H-2*py2));}
+  var area='M '+px(0)+' '+H;
+  counts.forEach(function(v,i){area+=' L '+px(i)+' '+py(v);});
+  area+=' L '+px(counts.length-1)+' '+H+' Z';
+  var ap=document.createElementNS('http://www.w3.org/2000/svg','path');
+  ap.setAttribute('d',area);ap.setAttribute('fill','rgba(255,107,0,0.1)');svg.appendChild(ap);
+  var lp=counts.map(function(v,i){return(i===0?'M':'L')+' '+px(i)+' '+py(v);}).join(' ');
+  var line=document.createElementNS('http://www.w3.org/2000/svg','path');
+  line.setAttribute('d',lp);line.setAttribute('fill','none');line.setAttribute('stroke','#FF6B00');
+  line.setAttribute('stroke-width','2');line.setAttribute('stroke-linejoin','round');svg.appendChild(line);
+  counts.forEach(function(v,i){
+    var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',px(i));c.setAttribute('cy',py(v));c.setAttribute('r','3');c.setAttribute('fill','#FF6B00');svg.appendChild(c);
+  });
+  [[0,dates[0]],[dates.length-1,dates[dates.length-1]]].forEach(function(pair){
+    var t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',px(pair[0]));t.setAttribute('y',H);
+    t.setAttribute('text-anchor',pair[0]===0?'start':'end');
+    t.setAttribute('fill','#999');t.setAttribute('font-size','9');t.setAttribute('font-family','DM Sans');
+    t.textContent=pair[1].slice(5);svg.appendChild(t);
+  });
+}
+
+// ── TABLE ──
+var ratingCls={best:'b-best',good:'b-good',avg:'b-avg',bad:'b-bad',defaulter:'b-defaulter'};
+var ratingLbl={best:'🏆 Best',good:'👍 Good',avg:'😐 Average',bad:'👎 Bad',defaulter:'🚫 Defaulter'};
+
+function renderTable(){
+  var s=(pg-1)*perPg,e=Math.min(s+perPg,displayed.length),rows=displayed.slice(s,e);
+  document.getElementById('tcount').textContent=displayed.length.toLocaleString('en-IN')+' records';
+  document.getElementById('pinfo').textContent='Showing '+(s+1)+'–'+e+' of '+displayed.length;
+
+  if(!rows.length){
+    document.getElementById('tbody').innerHTML='<tr><td colspan="10"><div class="empty"><div class="eico">🔍</div><div class="etxt">No records match your filters.</div></div></td></tr>';
+    document.getElementById('pbtns').innerHTML='';return;
+  }
+
+  var html=rows.map(function(r){
+    var rt=(r[11]||'').toLowerCase().trim();
+    var badge=rt?'<span class="badge '+(ratingCls[rt]||'')+'">'+(ratingLbl[rt]||r[11])+'</span>':'<span style="color:var(--t3)">—</span>';
+
+    // Location button — only show if lat/lng available
+    var lat=String(r[7]||'').trim(), lng=String(r[8]||'').trim();
+    var locCell='<span class="no-geo">No GPS</span>';
+    if(lat && lng && lat!=='null' && lng!=='null' && lat!=='' && lng!==''){
+      var mapsUrl='https://www.google.com/maps?q='+encodeURIComponent(lat+','+lng)+'&ll='+lat+','+lng+'&z=17';
+      locCell='<a class="map-btn" href="'+mapsUrl+'" target="_blank">📍 Map</a>';
+    }
+
+    return '<tr>'+
+      '<td style="color:var(--t3)">'+r[0]+'</td>'+
+      '<td style="color:var(--t3)">'+r[1]+'</td>'+
+      '<td style="font-weight:600">'+r[3]+'</td>'+
+      '<td style="font-weight:700">'+r[5]+'</td>'+
+      '<td style="color:var(--t2)">'+r[6]+'</td>'+
+      '<td style="font-weight:700;color:var(--bl)">'+(Number(r[9])?'₹'+Number(r[9]).toLocaleString('en-IN'):'—')+'</td>'+
+      '<td style="font-weight:700;color:var(--gr)">'+(Number(r[10])?'₹'+Number(r[10]).toLocaleString('en-IN'):'—')+'</td>'+
+      '<td>'+badge+'</td>'+
+      '<td>'+locCell+'</td>'+
+      '<td style="color:var(--t2);font-style:italic;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+r[12]+'">'+r[12]+'</td>'+
+    '</tr>';
+  }).join('');
+  document.getElementById('tbody').innerHTML=html;
+
+  var tp=Math.ceil(displayed.length/perPg);
+  var btnHTML='<button class="pb" onclick="goPage('+Math.max(1,pg-1)+')" '+(pg===1?'disabled':'')+'>‹</button>';
+  var ps=Math.max(1,pg-2),pe=Math.min(tp,ps+4);
+  for(var p=ps;p<=pe;p++)btnHTML+='<button class="pb'+(p===pg?' act':'')+'" onclick="goPage('+p+')">'+p+'</button>';
+  btnHTML+='<button class="pb" onclick="goPage('+Math.min(tp,pg+1)+')" '+(pg===tp?'disabled':'')+'>›</button>';
+  document.getElementById('pbtns').innerHTML=btnHTML;
+}
+
+function goPage(p){pg=p;renderTable();window.scrollTo(0,0);}
+
+// ── CSV EXPORT ──
+function exportCSV(){
+  var hdrs=["Date","Time","Rep Name","Party","Station","Order Rs","Collection Rs","Rating","Remark","Latitude","Longitude"];
+  var rows=[hdrs].concat(displayed.map(function(r){
+    return[r[0],r[1],r[3],r[5],r[6],r[9],r[10],r[11],r[12],r[7],r[8]].map(function(v){return'"'+(v||'').toString().replace(/"/g,'""')+'"';});
+  }));
+  var csv=rows.map(function(r){return r.join(',');}).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='dhoom-'+fmt(new Date())+'.csv';a.click();
+}
+
+function showLoader(s){document.getElementById('loader').classList.toggle('show',s);}
+</script>
+</body>
+</html>
