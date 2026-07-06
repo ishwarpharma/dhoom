@@ -8,12 +8,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --or:#FF6B00;--orl:#FFF3E8;--or2:#FF9F45;
+  --or:#FF6B00;--orl:#FFF3E8;
   --gr:#16A34A;--grl:#DCFCE7;
   --bl:#2563EB;--bll:#DBEAFE;
   --rd:#DC2626;--rdl:#FEE2E2;
   --am:#D97706;--aml:#FEF3C7;
-  --pu:#7C3AED;--pul:#EDE9FE;
   --bg:#F8F7F4;--card:#fff;
   --text:#111;--t2:#555;--t3:#999;--border:#E8E6E0;
   --fh:'Rajdhani',sans-serif;--fb:'DM Sans',sans-serif;
@@ -21,7 +20,6 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);font-family:var(--fb);color:var(--text);min-height:100vh;}
 
-/* TOP BAR */
 .topbar{background:#111;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--or);}
 .tb-brand{display:flex;align-items:center;gap:10px;}
 .tb-logo{width:30px;height:30px;}
@@ -31,85 +29,77 @@ body{background:var(--bg);font-family:var(--fb);color:var(--text);min-height:100
 .tb-upd{font-size:12px;color:#666;}
 .btn-rf{background:var(--or);border:none;color:#fff;padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);}
 .btn-rf:disabled{opacity:0.4;}
-.btn-back{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);}
+.btn-back{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);}
 
-/* PAGE */
 .page{max-width:1200px;margin:0 auto;padding:24px 20px;}
 
-/* ERROR */
 .errbanner{display:none;background:#FEE2E2;border:1px solid #fca5a5;color:var(--rd);padding:12px 18px;border-radius:10px;margin-bottom:16px;font-size:13px;font-weight:600;}
 .errbanner.show{display:block;}
 
-/* FILTER BAR */
-.fbar{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:20px;border:1px solid var(--border);box-shadow:0 1px 6px rgba(0,0,0,0.05);}
-.fbar-title{font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:0.5px;margin-bottom:12px;color:var(--text);}
-.fbar-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
-.fg{display:flex;flex-direction:column;gap:4px;}
-.fl{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em;}
-.fi{padding:8px 11px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;color:var(--text);font-family:var(--fb);outline:none;transition:border-color 0.2s;min-width:140px;}
-.fi:focus{border-color:var(--or);}
-.btn-apply{background:var(--or);border:none;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);height:36px;}
-.btn-clear{background:var(--bg);border:1.5px solid var(--border);color:var(--t2);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);height:36px;}
+/* MONTH TABS */
+.month-tabs-wrap{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:20px;border:1px solid var(--border);box-shadow:0 1px 6px rgba(0,0,0,0.05);}
+.month-tabs-title{font-family:var(--fh);font-size:15px;font-weight:700;margin-bottom:12px;letter-spacing:0.5px;}
+.month-tabs{display:flex;flex-wrap:wrap;gap:8px;}
+.mtab{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;color:var(--t2);transition:all 0.15s;font-family:var(--fb);}
+.mtab:hover{border-color:var(--or);color:var(--or);}
+.mtab.active{background:var(--or);border-color:var(--or);color:#fff;}
+.period-label{font-size:12px;color:var(--t3);margin-top:10px;font-weight:500;}
 
-/* QUICK DATE CHIPS */
-.dchips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
-.dc{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;color:var(--t2);transition:all 0.15s;font-family:var(--fb);}
-.dc:hover,.dc.active{background:var(--or);border-color:var(--or);color:#fff;}
-
-/* SUMMARY CARDS — REP LIST */
-.rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px;}
-.rep-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:18px;box-shadow:0 1px 5px rgba(0,0,0,0.05);cursor:pointer;transition:all 0.18s;position:relative;overflow:hidden;}
+/* REP GRID */
+.rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:24px;}
+.rep-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:18px;box-shadow:0 1px 5px rgba(0,0,0,0.05);cursor:pointer;transition:all 0.18s;position:relative;overflow:hidden;user-select:none;}
 .rep-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.1);border-color:var(--or);}
 .rep-card-stripe{position:absolute;top:0;left:0;right:0;height:3px;background:var(--or);}
-.rep-name{font-family:var(--fh);font-size:18px;font-weight:700;letter-spacing:0.5px;margin-bottom:10px;}
+.rep-name{font-family:var(--fh);font-size:19px;font-weight:700;letter-spacing:0.5px;margin-bottom:12px;}
 .rep-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .rs{background:var(--bg);border-radius:8px;padding:8px 10px;}
-.rs-num{font-size:18px;font-weight:700;color:var(--text);font-family:var(--fh);}
+.rs-num{font-size:20px;font-weight:700;color:var(--text);font-family:var(--fh);}
 .rs-num.orange{color:var(--or);}
 .rs-lbl{font-size:10px;color:var(--t3);font-weight:600;margin-top:2px;}
-.rep-working-days{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--t2);font-weight:600;}
-.rep-wd-bar{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;}
-.wd-dot{width:10px;height:10px;border-radius:2px;}
+.att-row{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.wd-dots{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;}
+.wd-dot{width:9px;height:9px;border-radius:2px;}
 .wd-present{background:var(--gr);}
 .wd-absent{background:var(--border);}
-.click-hint{font-size:10px;color:var(--t3);margin-top:8px;text-align:right;}
+.click-hint{font-size:10px;color:var(--t3);margin-top:8px;text-align:right;font-style:italic;}
 
-/* DETAIL VIEW */
-#detailView{display:none;}
-.detail-header{background:var(--card);border-radius:14px;padding:18px;margin-bottom:16px;border:1px solid var(--border);box-shadow:0 1px 5px rgba(0,0,0,0.05);}
-.detail-rep-name{font-family:var(--fh);font-size:24px;font-weight:700;letter-spacing:1px;margin-bottom:4px;}
-.detail-period{font-size:13px;color:var(--t2);font-weight:500;}
-.detail-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px;}
-.dk{background:var(--bg);border-radius:10px;padding:12px 14px;text-align:center;}
-.dk-num{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);}
-.dk-num.orange{color:var(--or);}
-.dk-lbl{font-size:11px;color:var(--t3);font-weight:600;margin-top:3px;}
-
-/* DAY TABLE */
-.day-table-card{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,0.04);margin-bottom:20px;}
-.day-table-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.day-table-title{font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:0.5px;}
-.twrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;}
-thead th{background:#FAFAF8;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);white-space:nowrap;}
-tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s;}
-tbody tr:last-child{border-bottom:none;}
-tbody tr:hover{background:#FFFAF5;}
-tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
-.day-present{color:var(--gr);font-weight:700;}
-.day-absent{color:var(--t3);font-style:italic;}
+/* BADGE */
 .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
 .b-green{background:var(--grl);color:var(--gr);}
 .b-red{background:var(--rdl);color:var(--rd);}
 .b-amber{background:var(--aml);color:var(--am);}
+.b-gray{background:var(--bg);color:var(--t3);border:1px solid var(--border);}
 
-/* EXPORT */
+/* DETAIL VIEW */
+#detailView{display:none;}
+.detail-header{background:var(--card);border-radius:14px;padding:20px;margin-bottom:16px;border:1px solid var(--border);}
+.detail-rep-name{font-family:var(--fh);font-size:26px;font-weight:700;letter-spacing:1px;}
+.detail-period{font-size:13px;color:var(--t2);margin-top:2px;margin-bottom:14px;}
+.detail-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;}
+.dk{background:var(--bg);border-radius:10px;padding:12px 14px;text-align:center;}
+.dk-num{font-family:var(--fh);font-size:24px;font-weight:700;color:var(--text);}
+.dk-num.orange{color:var(--or);}
+.dk-lbl{font-size:11px;color:var(--t3);font-weight:600;margin-top:3px;}
+
+/* TABLE */
+.tcard{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:20px;}
+.thead-bar{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ttitle{font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:0.5px;}
+.twrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{background:#FAFAF8;padding:11px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#FFFAF5;}
+tbody td{padding:11px 16px;font-size:14px;vertical-align:middle;}
+.row-absent td{background:#FAFAF8;color:var(--t3);}
+.row-sunday td{background:#F5F5F2;color:var(--t3);opacity:0.7;}
+
 .erow{display:flex;gap:8px;margin-bottom:16px;}
-.btn-exp{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);color:var(--t2);transition:all 0.15s;}
+.btn-exp{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);color:var(--t2);}
 .btn-exp:hover{border-color:var(--or);color:var(--or);}
 
-/* LOADER */
-#loader{display:none;position:fixed;inset:0;background:rgba(248,247,244,0.88);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(3px);}
+#loader{display:none;position:fixed;inset:0;background:rgba(248,247,244,0.9);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(3px);}
 #loader.show{display:flex;}
 .spin{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--or);border-radius:50%;animation:sp 0.7s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg);}}
@@ -122,7 +112,6 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
 
 <div id="loader"><div class="spin"></div><div class="ltxt" id="loaderTxt">Loading...</div></div>
 
-<!-- TOP BAR -->
 <div class="topbar">
   <div class="tb-brand">
     <svg class="tb-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
@@ -136,7 +125,7 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
     </svg>
     <div>
       <span class="tb-name">DHOOM</span>
-      <span class="tb-sub">Salary Summary</span>
+      <span class="tb-sub">Salary Processing</span>
     </div>
   </div>
   <div class="tb-right">
@@ -149,29 +138,21 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
 <div class="page">
   <div class="errbanner" id="errBanner"></div>
 
-  <!-- FILTER BAR -->
-  <div class="fbar">
-    <div class="fbar-title">Select Period</div>
-    <div class="dchips">
-      <div class="dc" onclick="setQuick('thismonth')">📅 This Month</div>
-      <div class="dc" onclick="setQuick('lastmonth')">⏮ Last Month</div>
-      <div class="dc" onclick="setQuick('last7')">📆 Last 7 Days</div>
-      <div class="dc" onclick="setQuick('last30')">🗓 Last 30 Days</div>
-    </div>
-    <div class="fbar-row">
-      <div class="fg"><div class="fl">From Date</div><input type="date" class="fi" id="fFrom"></div>
-      <div class="fg"><div class="fl">To Date</div><input type="date" class="fi" id="fTo"></div>
-      <button class="btn-apply" onclick="applyAndRender()">Apply</button>
-      <button class="btn-clear" onclick="clearFilters()">✕ Clear</button>
-    </div>
+  <!-- MONTH TABS -->
+  <div class="month-tabs-wrap">
+    <div class="month-tabs-title">Select Month</div>
+    <div class="month-tabs" id="monthTabs"></div>
+    <div class="period-label" id="periodLabel">—</div>
   </div>
 
-  <!-- REP LIST VIEW -->
+  <!-- LIST VIEW -->
   <div id="listView">
-    <div class="rep-grid" id="repGrid"></div>
+    <div class="rep-grid" id="repGrid">
+      <div style="color:var(--t3);text-align:center;padding:40px;grid-column:1/-1;font-size:14px;">Loading data...</div>
+    </div>
   </div>
 
-  <!-- REP DETAIL VIEW -->
+  <!-- DETAIL VIEW -->
   <div id="detailView">
     <div class="detail-header">
       <div class="detail-rep-name" id="detailName">—</div>
@@ -179,13 +160,13 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
       <div class="detail-kpis" id="detailKpis"></div>
     </div>
     <div class="erow">
-      <button class="btn-exp" onclick="exportRepCSV()">⬇ Export CSV</button>
+      <button class="btn-exp" onclick="exportCSV()">⬇ Export CSV</button>
       <button class="btn-exp" onclick="window.print()">🖨 Print</button>
     </div>
-    <div class="day-table-card">
-      <div class="day-table-head">
-        <div class="day-table-title">Day-wise Attendance & Activity</div>
-        <div style="font-size:12px;color:var(--t3);" id="detailCount">—</div>
+    <div class="tcard">
+      <div class="thead-bar">
+        <div class="ttitle">Day-wise Summary</div>
+        <div style="font-size:12px;color:var(--t3);" id="detailSub">—</div>
       </div>
       <div class="twrap">
         <table>
@@ -196,10 +177,7 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
               <th>Status</th>
               <th>First Call</th>
               <th>Last Call</th>
-              <th>Total Calls</th>
-              <th>Orders (₹)</th>
-              <th>Collection (₹)</th>
-              <th>Parties Visited</th>
+              <th>Total Visits</th>
             </tr>
           </thead>
           <tbody id="detailBody"></tbody>
@@ -210,332 +188,344 @@ tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
 </div>
 
 <script>
-// ════════════════════════════════
 var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysz5L-MOu0T6IH-c9CmRzCRpE6DoUynVvBhhfSALPmv8_Za5XX1910kW8HD4TJz6bdUA/exec";
-// ════════════════════════════════
 
 var allRows = [];
-var currentRep = null;
+var selectedFrom = "";
+var selectedTo = "";
+var currentRep = "";
 var currentRepRows = [];
+var DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
+// ── BOOT ──
 window.onload = function(){
-  setQuick('thismonth');
+  buildMonthTabs();
   loadData();
 };
 
-// ── QUICK DATE ──
-function setQuick(q){
-  document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
-  event && event.target && event.target.classList && event.target.classList.add('active');
-  var now=new Date(), from=new Date(), to=new Date();
-  if(q==='thismonth'){from=new Date(now.getFullYear(),now.getMonth(),1);to=now;}
-  else if(q==='lastmonth'){
-    from=new Date(now.getFullYear(),now.getMonth()-1,1);
-    to=new Date(now.getFullYear(),now.getMonth(),0);
+// ── BUILD 12 MONTH TABS ──
+function buildMonthTabs(){
+  var now = new Date();
+  var tabs = document.getElementById("monthTabs");
+  tabs.innerHTML = "";
+  // Generate last 12 months + current
+  for(var i = 11; i >= 0; i--){
+    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    var yr = d.getFullYear();
+    var mo = d.getMonth(); // 0-based
+    var label = MONTHS[mo].substring(0,3) + " " + yr;
+    var btn = document.createElement("div");
+    btn.className = "mtab" + (i === 0 ? " active" : "");
+    btn.textContent = label;
+    btn.setAttribute("data-yr", yr);
+    btn.setAttribute("data-mo", mo);
+    btn.onclick = function(){
+      document.querySelectorAll(".mtab").forEach(function(t){t.classList.remove("active");});
+      this.classList.add("active");
+      selectMonth(parseInt(this.getAttribute("data-yr")), parseInt(this.getAttribute("data-mo")));
+    };
+    tabs.appendChild(btn);
   }
-  else if(q==='last7'){from=new Date(now-7*864e5);to=now;}
-  else if(q==='last30'){from=new Date(now-30*864e5);to=now;}
-  document.getElementById('fFrom').value=fmt(from);
-  document.getElementById('fTo').value=fmt(to);
+  // Default: current month
+  selectMonth(now.getFullYear(), now.getMonth());
+}
+
+function selectMonth(yr, mo){
+  var from = new Date(yr, mo, 1);
+  var to   = new Date(yr, mo + 1, 0); // last day of month
+  selectedFrom = fmt(from);
+  selectedTo   = fmt(to);
+  document.getElementById("periodLabel").textContent =
+    "Period: " + selectedFrom + "  to  " + selectedTo +
+    "  (" + to.getDate() + " days)";
   if(allRows.length) applyAndRender();
 }
 
-function fmt(d){return d.toISOString().slice(0,10);}
-
-function clearFilters(){
-  document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
-  setQuick('thismonth');
-}
+function fmt(d){ return d.toISOString().slice(0,10); }
+function pad(n){ return n < 10 ? "0" + n : String(n); }
 
 // ── LOAD DATA ──
 function loadData(){
-  showLoader('Loading attendance data...');
-  document.getElementById('rfBtn').disabled=true;
-  document.getElementById('errBanner').classList.remove('show');
+  showLoader("Loading data...");
+  document.getElementById("rfBtn").disabled = true;
+  document.getElementById("errBanner").classList.remove("show");
+
   fetch(SCRIPT_URL + "?action=all&cb=" + Date.now())
     .then(function(r){
-      if(!r.ok) throw new Error("HTTP "+r.status);
+      if(!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
     })
     .then(function(data){
-      if(!data.success) throw new Error(data.error||"Script error");
-      allRows = (data.rows||[]).map(function(r){
+      if(!data.success) throw new Error(data.error || "Script error");
+
+      allRows = (data.rows || []).map(function(r){
         // Normalize date
-        var rawDate=String(r.date||'');
-        if(rawDate.length>10 && rawDate.indexOf('-')===-1){
-          var d=new Date(rawDate);
-          if(!isNaN(d.getTime())) rawDate=fmt(d);
+        var rawDate = String(r.date || "").trim();
+        if(rawDate.length > 10 && rawDate.indexOf("-") === -1){
+          var d = new Date(rawDate);
+          if(!isNaN(d.getTime())) rawDate = fmt(d);
         }
-        // Normalize time
-        var rawTime=String(r.time||'');
-        if(rawTime.length>8){
-          var td=new Date(rawTime);
-          if(!isNaN(td.getTime())) rawTime=pad(td.getHours())+':'+pad(td.getMinutes());
+        // Normalize time to HH:MM
+        var rawTime = String(r.time || "").trim();
+        if(rawTime.length > 5){
+          var td = new Date("2000-01-01T" + rawTime);
+          if(isNaN(td.getTime())) {
+            td = new Date(rawTime);
+          }
+          if(!isNaN(td.getTime())) rawTime = pad(td.getHours()) + ":" + pad(td.getMinutes());
         }
         return {
-          date:rawDate, time:rawTime,
-          userId:r.userId, repName:String(r.repName||'').trim(),
-          party:String(r.party||'').trim(),
-          station:String(r.station||'').trim(),
-          order:Number(r.order)||0,
-          collection:Number(r.collection)||0,
-          rating:String(r.rating||'').trim()
+          date: rawDate,
+          time: rawTime,
+          repName: String(r.repName || "").trim(),
+          party: String(r.party || "").trim(),
+          order: Number(r.order) || 0,
+          collection: Number(r.collection) || 0
         };
-      }).filter(function(r){return r.repName && r.date;});
+      }).filter(function(r){ return r.repName && r.date && r.date.length === 10; });
 
       hideLoader();
-      document.getElementById('rfBtn').disabled=false;
-      document.getElementById('lastUpd').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      document.getElementById("rfBtn").disabled = false;
+      document.getElementById("lastUpd").textContent =
+        "Updated " + new Date().toLocaleTimeString("en-IN", {hour:"2-digit", minute:"2-digit"});
       applyAndRender();
     })
     .catch(function(err){
       hideLoader();
-      document.getElementById('rfBtn').disabled=false;
-      document.getElementById('errBanner').textContent='⚠️ Could not connect: '+err.message;
-      document.getElementById('errBanner').classList.add('show');
+      document.getElementById("rfBtn").disabled = false;
+      document.getElementById("errBanner").textContent = "⚠️ " + err.message + " — Make sure Apps Script is deployed with Anyone access.";
+      document.getElementById("errBanner").classList.add("show");
     });
 }
 
-function pad(n){return n<10?'0'+n:String(n);}
-
 // ── FILTER & RENDER ──
 function applyAndRender(){
-  var fr=document.getElementById('fFrom').value;
-  var to=document.getElementById('fTo').value;
-  var filtered=allRows.filter(function(r){
-    if(fr && r.date<fr) return false;
-    if(to && r.date>to) return false;
-    return true;
+  var filtered = allRows.filter(function(r){
+    return r.date >= selectedFrom && r.date <= selectedTo;
   });
-
   if(currentRep){
-    // Re-render detail view with new filter
-    showDetail(currentRep, filtered);
+    renderDetail(currentRep, filtered.filter(function(r){ return r.repName === currentRep; }));
   } else {
-    renderRepGrid(filtered, fr, to);
+    renderGrid(filtered);
   }
 }
 
 // ── REP GRID ──
-function renderRepGrid(rows, fr, to){
+function renderGrid(rows){
   // Group by rep
-  var reps={};
+  var reps = {};
   rows.forEach(function(r){
-    if(!reps[r.repName]) reps[r.repName]={rows:[],days:{}};
+    if(!reps[r.repName]) reps[r.repName] = { rows: [], days: {} };
     reps[r.repName].rows.push(r);
-    reps[r.repName].days[r.date]=1;
+    reps[r.repName].days[r.date] = 1;
   });
 
-  // Generate all dates in range for absent tracking
-  var allDates=getDatesInRange(fr,to);
+  var allDates = getDatesInRange(selectedFrom, selectedTo);
+  var sorted = Object.keys(reps).sort();
 
-  var sorted=Object.keys(reps).sort();
   if(!sorted.length){
-    document.getElementById('repGrid').innerHTML='<div style="color:var(--t3);font-size:14px;text-align:center;padding:40px;grid-column:1/-1;">No data for selected period.</div>';
+    document.getElementById("repGrid").innerHTML =
+      '<div style="color:var(--t3);text-align:center;padding:40px;grid-column:1/-1;font-size:14px;">No data for this period.</div>';
     return;
   }
 
-  var html=sorted.map(function(name){
-    var d=reps[name];
-    var workDays=Object.keys(d.days).length;
-    var totalDays=allDates.length;
-    var totalCalls=d.rows.length;
-    var totalOrder=d.rows.reduce(function(s,r){return s+r.order;},0);
-    var totalColl=d.rows.reduce(function(s,r){return s+r.collection;},0);
+  // Build each card as a DOM element to avoid onclick escaping issues
+  var grid = document.getElementById("repGrid");
+  grid.innerHTML = "";
 
-    // Working days dots (max 31)
-    var dots=allDates.slice(0,31).map(function(dt){
-      return '<div class="wd-dot '+(d.days[dt]?'wd-present':'wd-absent')+'" title="'+dt+'"></div>';
-    }).join('');
+  sorted.forEach(function(name){
+    var d = reps[name];
+    var workDays = Object.keys(d.days).length;
+    var totalDays = allDates.length;
+    var totalCalls = d.rows.length;
+    var totalOrder = d.rows.reduce(function(s,r){return s+r.order;},0);
+    var totalColl  = d.rows.reduce(function(s,r){return s+r.collection;},0);
+    var attPct = totalDays > 0 ? Math.round(workDays / totalDays * 100) : 0;
+    var attCls = attPct >= 80 ? "b-green" : attPct >= 60 ? "b-amber" : "b-red";
 
-    // Attendance %
-    var attPct=totalDays>0?Math.round(workDays/totalDays*100):0;
-    var attBadge=attPct>=80?'b-green':attPct>=60?'b-amber':'b-red';
+    // Working day dots
+    var dotsHTML = allDates.slice(0,31).map(function(dt){
+      return '<div class="wd-dot ' + (d.days[dt] ? "wd-present" : "wd-absent") + '" title="' + dt + '"></div>';
+    }).join("");
 
-    return '<div class="rep-card" onclick="openRep(\''+name.replace(/'/g,"\\'")+'\')">'+
-      '<div class="rep-card-stripe"></div>'+
-      '<div class="rep-name">'+name+'</div>'+
-      '<div class="rep-stats">'+
-        '<div class="rs"><div class="rs-num orange">'+workDays+'</div><div class="rs-lbl">Working Days</div></div>'+
-        '<div class="rs"><div class="rs-num">'+totalCalls+'</div><div class="rs-lbl">Total Calls</div></div>'+
-        '<div class="rs"><div class="rs-num">₹'+fmtM(totalOrder)+'</div><div class="rs-lbl">Orders</div></div>'+
-        '<div class="rs"><div class="rs-num">₹'+fmtM(totalColl)+'</div><div class="rs-lbl">Collection</div></div>'+
-      '</div>'+
-      '<div class="rep-working-days">'+
-        '<span class="badge '+attBadge+'">'+attPct+'% attendance</span> &nbsp;'+workDays+' of '+totalDays+' days'+
-        '<div class="rep-wd-bar">'+dots+'</div>'+
-      '</div>'+
-      '<div class="click-hint">Tap for day-wise detail →</div>'+
-    '</div>';
-  }).join('');
+    var card = document.createElement("div");
+    card.className = "rep-card";
+    card.innerHTML =
+      '<div class="rep-card-stripe"></div>' +
+      '<div class="rep-name">' + name + '</div>' +
+      '<div class="rep-stats">' +
+        '<div class="rs"><div class="rs-num orange">' + workDays + '</div><div class="rs-lbl">Working Days</div></div>' +
+        '<div class="rs"><div class="rs-num">' + totalCalls + '</div><div class="rs-lbl">Total Visits</div></div>' +
+        '<div class="rs"><div class="rs-num">₹' + fmtN(totalOrder) + '</div><div class="rs-lbl">Orders</div></div>' +
+        '<div class="rs"><div class="rs-num">₹' + fmtN(totalColl) + '</div><div class="rs-lbl">Collection</div></div>' +
+      '</div>' +
+      '<div class="att-row">' +
+        '<span class="badge ' + attCls + '">' + attPct + '% attendance</span>' +
+        '<span style="font-size:12px;color:var(--t3);">' + workDays + ' / ' + totalDays + ' days</span>' +
+      '</div>' +
+      '<div class="wd-dots">' + dotsHTML + '</div>' +
+      '<div class="click-hint">Tap for day-wise detail →</div>';
 
-  document.getElementById('repGrid').innerHTML=html;
-}
+    // Use closure to capture name correctly
+    (function(repName){
+      card.addEventListener("click", function(){ openRep(repName); });
+    })(name);
 
-function fmtM(n){
-  if(n>=100000) return (n/100000).toFixed(1)+'L';
-  if(n>=1000) return (n/1000).toFixed(1)+'K';
-  return n.toLocaleString('en-IN');
-}
-
-// ── OPEN REP DETAIL ──
-function openRep(name){
-  currentRep=name;
-  var fr=document.getElementById('fFrom').value;
-  var to=document.getElementById('fTo').value;
-  var filtered=allRows.filter(function(r){
-    if(r.repName!==name) return false;
-    if(fr && r.date<fr) return false;
-    if(to && r.date>to) return false;
-    return true;
+    grid.appendChild(card);
   });
-  showDetail(name, filtered);
-  document.getElementById('backBtn').style.display='';
-  document.getElementById('listView').style.display='none';
-  document.getElementById('detailView').style.display='';
-  window.scrollTo(0,0);
 }
 
-function showDetail(name, rows){
-  var fr=document.getElementById('fFrom').value;
-  var to=document.getElementById('fTo').value;
-  var allDates=getDatesInRange(fr,to);
+function fmtN(n){
+  if(n >= 100000) return (n/100000).toFixed(1) + "L";
+  if(n >= 1000)   return (n/1000).toFixed(1) + "K";
+  return n.toLocaleString("en-IN");
+}
+
+// ── OPEN REP ──
+function openRep(name){
+  currentRep = name;
+  var repRows = allRows.filter(function(r){
+    return r.repName === name && r.date >= selectedFrom && r.date <= selectedTo;
+  });
+  currentRepRows = repRows;
+  renderDetail(name, repRows);
+  document.getElementById("backBtn").style.display = "";
+  document.getElementById("listView").style.display = "none";
+  document.getElementById("detailView").style.display = "";
+  window.scrollTo(0, 0);
+}
+
+// ── RENDER DETAIL ──
+function renderDetail(name, rows){
+  var allDates = getDatesInRange(selectedFrom, selectedTo);
 
   // Group by date
-  var byDate={};
+  var byDate = {};
   rows.forEach(function(r){
-    if(!byDate[r.date]) byDate[r.date]={times:[],parties:[],order:0,collection:0};
+    if(!byDate[r.date]) byDate[r.date] = { times: [], parties: [], order: 0, collection: 0 };
     if(r.time) byDate[r.date].times.push(r.time);
     if(r.party) byDate[r.date].parties.push(r.party);
-    byDate[r.date].order+=r.order;
-    byDate[r.date].collection+=r.collection;
+    byDate[r.date].order      += r.order;
+    byDate[r.date].collection += r.collection;
   });
 
   // KPIs
-  var workDays=Object.keys(byDate).length;
-  var totalDays=allDates.length;
-  var totalCalls=rows.length;
-  var totalOrder=rows.reduce(function(s,r){return s+r.order;},0);
-  var totalColl=rows.reduce(function(s,r){return s+r.collection;},0);
-  var avgCalls=workDays>0?(totalCalls/workDays).toFixed(1):0;
+  var workDays   = Object.keys(byDate).length;
+  var totalDays  = allDates.length;
+  var totalVisits= rows.length;
+  var totalOrder = rows.reduce(function(s,r){return s+r.order;},0);
+  var totalColl  = rows.reduce(function(s,r){return s+r.collection;},0);
+  var avgVisits  = workDays > 0 ? (totalVisits / workDays).toFixed(1) : 0;
+  var attPct     = totalDays > 0 ? Math.round(workDays / totalDays * 100) : 0;
 
-  document.getElementById('detailName').textContent=name;
-  document.getElementById('detailPeriod').textContent=(fr||'Start')+' to '+(to||'Today');
-  document.getElementById('detailCount').textContent=workDays+' working days';
+  document.getElementById("detailName").textContent = name;
+  document.getElementById("detailPeriod").textContent = selectedFrom + "  to  " + selectedTo;
+  document.getElementById("detailSub").textContent = workDays + " working days of " + totalDays;
 
-  document.getElementById('detailKpis').innerHTML=
-    '<div class="dk"><div class="dk-num orange">'+workDays+'</div><div class="dk-lbl">Working Days</div></div>'+
-    '<div class="dk"><div class="dk-num">'+totalDays+'</div><div class="dk-lbl">Total Days</div></div>'+
-    '<div class="dk"><div class="dk-num">'+(totalDays>0?Math.round(workDays/totalDays*100):0)+'%</div><div class="dk-lbl">Attendance</div></div>'+
-    '<div class="dk"><div class="dk-num">'+totalCalls+'</div><div class="dk-lbl">Total Calls</div></div>'+
-    '<div class="dk"><div class="dk-num">'+avgCalls+'</div><div class="dk-lbl">Avg Calls/Day</div></div>'+
-    '<div class="dk"><div class="dk-num">₹'+fmtM(totalOrder)+'</div><div class="dk-lbl">Total Orders</div></div>'+
-    '<div class="dk"><div class="dk-num">₹'+fmtM(totalColl)+'</div><div class="dk-lbl">Collection</div></div>';
+  document.getElementById("detailKpis").innerHTML =
+    '<div class="dk"><div class="dk-num orange">' + workDays + '</div><div class="dk-lbl">Working Days</div></div>' +
+    '<div class="dk"><div class="dk-num">' + attPct + '%</div><div class="dk-lbl">Attendance</div></div>' +
+    '<div class="dk"><div class="dk-num">' + totalVisits + '</div><div class="dk-lbl">Total Visits</div></div>' +
+    '<div class="dk"><div class="dk-num">' + avgVisits + '</div><div class="dk-lbl">Avg Visits/Day</div></div>' +
+    '<div class="dk"><div class="dk-num">₹' + fmtN(totalOrder) + '</div><div class="dk-lbl">Total Orders</div></div>' +
+    '<div class="dk"><div class="dk-num">₹' + fmtN(totalColl) + '</div><div class="dk-lbl">Collection</div></div>';
 
-  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-  // Build table — ALL dates in range
-  var bodyHTML=allDates.map(function(dt){
-    var d=byDate[dt];
-    var dayName=days[new Date(dt+'T00:00:00').getDay()];
-    var isSun=dayName==='Sun';
+  // Table rows
+  var bodyHTML = allDates.map(function(dt){
+    var dow     = new Date(dt + "T00:00:00").getDay();
+    var dayName = DAYS[dow];
+    var isSun   = dow === 0;
+    var d       = byDate[dt];
 
     if(!d){
-      // Absent
-      return '<tr style="'+(isSun?'opacity:0.5':'')+'">'+
-        '<td><b>'+dt+'</b></td>'+
-        '<td style="color:var(--t3)">'+dayName+'</td>'+
-        '<td><span class="badge '+(isSun?'':'b-red')+'">'+(isSun?'Sunday':'Absent')+'</span></td>'+
-        '<td style="color:var(--t3)">—</td>'+
-        '<td style="color:var(--t3)">—</td>'+
-        '<td style="color:var(--t3)">0</td>'+
-        '<td style="color:var(--t3)">—</td>'+
-        '<td style="color:var(--t3)">—</td>'+
-        '<td style="color:var(--t3)">—</td>'+
+      var rowCls = isSun ? "row-sunday" : "row-absent";
+      var status = isSun
+        ? '<span class="badge b-gray">Sunday</span>'
+        : '<span class="badge b-red">Absent</span>';
+      return '<tr class="' + rowCls + '">' +
+        '<td><b>' + dt + '</b></td>' +
+        '<td>' + dayName + '</td>' +
+        '<td>' + status + '</td>' +
+        '<td>—</td><td>—</td><td>—</td>' +
       '</tr>';
     }
 
-    var times=d.times.sort();
-    var firstCall=times.length?fmt12(times[0]):'—';
-    var lastCall=times.length>1?fmt12(times[times.length-1]):(times.length?fmt12(times[0]):'—');
-    var uniqueParties=[...new Set(d.parties)];
+    // Sort times
+    var times = d.times.filter(function(t){ return t && t.length >= 4; }).sort();
+    var firstCall = times.length ? fmt12(times[0]) : "—";
+    var lastCall  = times.length > 1 ? fmt12(times[times.length - 1]) : (times.length === 1 ? fmt12(times[0]) + " (only)" : "—");
 
-    return '<tr>'+
-      '<td><b>'+dt+'</b></td>'+
-      '<td>'+dayName+'</td>'+
-      '<td><span class="badge b-green">Present</span></td>'+
-      '<td style="color:var(--gr);font-weight:700;">'+firstCall+'</td>'+
-      '<td style="color:var(--or);font-weight:700;">'+lastCall+'</td>'+
-      '<td style="font-weight:700;font-size:16px;">'+d.times.length+'</td>'+
-      '<td style="color:var(--bl);font-weight:700;">'+(d.order?'₹'+d.order.toLocaleString('en-IN'):'—')+'</td>'+
-      '<td style="color:var(--gr);font-weight:700;">'+(d.collection?'₹'+d.collection.toLocaleString('en-IN'):'—')+'</td>'+
-      '<td style="font-size:12px;color:var(--t2);max-width:200px;">'+uniqueParties.slice(0,4).join(', ')+(uniqueParties.length>4?' +'+( uniqueParties.length-4)+' more':'')+'</td>'+
+    return '<tr>' +
+      '<td><b>' + dt + '</b></td>' +
+      '<td>' + dayName + '</td>' +
+      '<td><span class="badge b-green">Present</span></td>' +
+      '<td style="color:var(--gr);font-weight:700;font-size:15px;">' + firstCall + '</td>' +
+      '<td style="color:var(--or);font-weight:700;font-size:15px;">' + lastCall + '</td>' +
+      '<td style="font-weight:800;font-size:18px;color:var(--text);">' + d.times.length + '</td>' +
     '</tr>';
-  }).join('');
+  }).join("");
 
-  document.getElementById('detailBody').innerHTML=bodyHTML;
-  currentRepRows=rows;
+  document.getElementById("detailBody").innerHTML = bodyHTML;
 }
 
 function fmt12(t){
-  if(!t) return '—';
-  var p=t.split(':'),h=parseInt(p[0]),m=p[1]||'00',ampm=h>=12?'pm':'am';
-  h=h%12||12;
-  return h+':'+m+' '+ampm;
+  if(!t || t.length < 4) return "—";
+  var p = t.split(":"), h = parseInt(p[0]), m = p[1] || "00";
+  var ampm = h >= 12 ? " pm" : " am";
+  h = h % 12 || 12;
+  return h + ":" + m + ampm;
 }
 
-// ── BACK TO LIST ──
+// ── BACK ──
 function showList(){
-  currentRep=null;
-  document.getElementById('backBtn').style.display='none';
-  document.getElementById('detailView').style.display='none';
-  document.getElementById('listView').style.display='';
+  currentRep = "";
+  currentRepRows = [];
+  document.getElementById("backBtn").style.display = "none";
+  document.getElementById("detailView").style.display = "none";
+  document.getElementById("listView").style.display = "";
 }
 
-// ── DATE RANGE HELPER ──
+// ── DATES ──
 function getDatesInRange(from, to){
-  if(!from||!to) return [];
-  var dates=[], cur=new Date(from+'T00:00:00'), end=new Date(to+'T00:00:00');
-  while(cur<=end){
-    dates.push(fmt(cur));
-    cur.setDate(cur.getDate()+1);
-  }
+  if(!from || !to) return [];
+  var dates = [], cur = new Date(from + "T00:00:00"), end = new Date(to + "T00:00:00");
+  while(cur <= end){ dates.push(fmt(cur)); cur.setDate(cur.getDate() + 1); }
   return dates;
 }
 
 // ── EXPORT CSV ──
-function exportRepCSV(){
+function exportCSV(){
   if(!currentRep) return;
-  var fr=document.getElementById('fFrom').value;
-  var to=document.getElementById('fTo').value;
-  var allDates=getDatesInRange(fr,to);
-  var byDate={};
+  var allDates = getDatesInRange(selectedFrom, selectedTo);
+  var byDate = {};
   currentRepRows.forEach(function(r){
-    if(!byDate[r.date]) byDate[r.date]={times:[],parties:[],order:0,collection:0};
+    if(!byDate[r.date]) byDate[r.date] = { times: [] };
     if(r.time) byDate[r.date].times.push(r.time);
-    if(r.party) byDate[r.date].parties.push(r.party);
-    byDate[r.date].order+=r.order;
-    byDate[r.date].collection+=r.collection;
   });
-  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  var hdrs=["Date","Day","Status","First Call","Last Call","Total Calls","Orders Rs","Collection Rs","Parties Visited"];
-  var rowsCSV=[hdrs].concat(allDates.map(function(dt){
-    var d=byDate[dt];
-    var dayName=days[new Date(dt+'T00:00:00').getDay()];
-    if(!d) return [dt,dayName,dayName==='Sun'?'Sunday':'Absent','—','—','0','—','—','—'];
-    var times=d.times.sort();
-    var up=[...new Set(d.parties)];
-    return [dt,dayName,'Present',times.length?times[0]:'—',times.length?times[times.length-1]:'—',d.times.length,d.order,d.collection,up.join(' | ')];
-  }));
-  var csv=rowsCSV.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='salary-'+currentRep.replace(/\s+/g,'-')+'-'+fr+'-to-'+to+'.csv';
+  var hdrs = ["Date","Day","Status","First Call","Last Call","Total Visits"];
+  var csv  = [hdrs].concat(allDates.map(function(dt){
+    var dow     = new Date(dt + "T00:00:00").getDay();
+    var dayName = DAYS[dow];
+    var d       = byDate[dt];
+    if(!d) return [dt, dayName, dow===0?"Sunday":"Absent", "—", "—", "0"];
+    var times = d.times.filter(function(t){return t;}).sort();
+    return [dt, dayName, "Present",
+      times.length ? times[0] : "—",
+      times.length ? times[times.length-1] : "—",
+      d.times.length];
+  })).map(function(r){
+    return r.map(function(v){ return '"' + String(v).replace(/"/g,'""') + '"'; }).join(",");
+  }).join("\n");
+
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
+  a.download = "salary-" + currentRep.replace(/\s+/g,"-") + "-" + selectedFrom + "-to-" + selectedTo + ".csv";
   a.click();
 }
 
-function showLoader(t){document.getElementById('loaderTxt').textContent=t||'Loading...';document.getElementById('loader').classList.add('show');}
-function hideLoader(){document.getElementById('loader').classList.remove('show');}
+function showLoader(t){ document.getElementById("loaderTxt").textContent = t||"Loading..."; document.getElementById("loader").classList.add("show"); }
+function hideLoader(){ document.getElementById("loader").classList.remove("show"); }
 </script>
 </body>
 </html>
