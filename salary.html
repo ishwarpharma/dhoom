@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dhoom — Salary Summary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --or:#FF6B00;--orl:#FFF3E8;--or2:#FF9F45;
+  --gr:#16A34A;--grl:#DCFCE7;
+  --bl:#2563EB;--bll:#DBEAFE;
+  --rd:#DC2626;--rdl:#FEE2E2;
+  --am:#D97706;--aml:#FEF3C7;
+  --pu:#7C3AED;--pul:#EDE9FE;
+  --bg:#F8F7F4;--card:#fff;
+  --text:#111;--t2:#555;--t3:#999;--border:#E8E6E0;
+  --fh:'Rajdhani',sans-serif;--fb:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:var(--fb);color:var(--text);min-height:100vh;}
+
+/* TOP BAR */
+.topbar{background:#111;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--or);}
+.tb-brand{display:flex;align-items:center;gap:10px;}
+.tb-logo{width:30px;height:30px;}
+.tb-name{font-family:var(--fh);font-size:20px;font-weight:700;letter-spacing:4px;color:#fff;}
+.tb-sub{font-size:11px;color:#666;letter-spacing:2px;text-transform:uppercase;margin-left:4px;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-upd{font-size:12px;color:#666;}
+.btn-rf{background:var(--or);border:none;color:#fff;padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);}
+.btn-rf:disabled{opacity:0.4;}
+.btn-back{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);}
+
+/* PAGE */
+.page{max-width:1200px;margin:0 auto;padding:24px 20px;}
+
+/* ERROR */
+.errbanner{display:none;background:#FEE2E2;border:1px solid #fca5a5;color:var(--rd);padding:12px 18px;border-radius:10px;margin-bottom:16px;font-size:13px;font-weight:600;}
+.errbanner.show{display:block;}
+
+/* FILTER BAR */
+.fbar{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:20px;border:1px solid var(--border);box-shadow:0 1px 6px rgba(0,0,0,0.05);}
+.fbar-title{font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:0.5px;margin-bottom:12px;color:var(--text);}
+.fbar-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fl{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em;}
+.fi{padding:8px 11px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;color:var(--text);font-family:var(--fb);outline:none;transition:border-color 0.2s;min-width:140px;}
+.fi:focus{border-color:var(--or);}
+.btn-apply{background:var(--or);border:none;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);height:36px;}
+.btn-clear{background:var(--bg);border:1.5px solid var(--border);color:var(--t2);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);height:36px;}
+
+/* QUICK DATE CHIPS */
+.dchips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.dc{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;color:var(--t2);transition:all 0.15s;font-family:var(--fb);}
+.dc:hover,.dc.active{background:var(--or);border-color:var(--or);color:#fff;}
+
+/* SUMMARY CARDS — REP LIST */
+.rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px;}
+.rep-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:18px;box-shadow:0 1px 5px rgba(0,0,0,0.05);cursor:pointer;transition:all 0.18s;position:relative;overflow:hidden;}
+.rep-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.1);border-color:var(--or);}
+.rep-card-stripe{position:absolute;top:0;left:0;right:0;height:3px;background:var(--or);}
+.rep-name{font-family:var(--fh);font-size:18px;font-weight:700;letter-spacing:0.5px;margin-bottom:10px;}
+.rep-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rs{background:var(--bg);border-radius:8px;padding:8px 10px;}
+.rs-num{font-size:18px;font-weight:700;color:var(--text);font-family:var(--fh);}
+.rs-num.orange{color:var(--or);}
+.rs-lbl{font-size:10px;color:var(--t3);font-weight:600;margin-top:2px;}
+.rep-working-days{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--t2);font-weight:600;}
+.rep-wd-bar{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;}
+.wd-dot{width:10px;height:10px;border-radius:2px;}
+.wd-present{background:var(--gr);}
+.wd-absent{background:var(--border);}
+.click-hint{font-size:10px;color:var(--t3);margin-top:8px;text-align:right;}
+
+/* DETAIL VIEW */
+#detailView{display:none;}
+.detail-header{background:var(--card);border-radius:14px;padding:18px;margin-bottom:16px;border:1px solid var(--border);box-shadow:0 1px 5px rgba(0,0,0,0.05);}
+.detail-rep-name{font-family:var(--fh);font-size:24px;font-weight:700;letter-spacing:1px;margin-bottom:4px;}
+.detail-period{font-size:13px;color:var(--t2);font-weight:500;}
+.detail-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px;}
+.dk{background:var(--bg);border-radius:10px;padding:12px 14px;text-align:center;}
+.dk-num{font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);}
+.dk-num.orange{color:var(--or);}
+.dk-lbl{font-size:11px;color:var(--t3);font-weight:600;margin-top:3px;}
+
+/* DAY TABLE */
+.day-table-card{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 5px rgba(0,0,0,0.04);margin-bottom:20px;}
+.day-table-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.day-table-title{font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:0.5px;}
+.twrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{background:#FAFAF8;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#FFFAF5;}
+tbody td{padding:10px 14px;font-size:13px;vertical-align:middle;}
+.day-present{color:var(--gr);font-weight:700;}
+.day-absent{color:var(--t3);font-style:italic;}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.b-green{background:var(--grl);color:var(--gr);}
+.b-red{background:var(--rdl);color:var(--rd);}
+.b-amber{background:var(--aml);color:var(--am);}
+
+/* EXPORT */
+.erow{display:flex;gap:8px;margin-bottom:16px;}
+.btn-exp{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);color:var(--t2);transition:all 0.15s;}
+.btn-exp:hover{border-color:var(--or);color:var(--or);}
+
+/* LOADER */
+#loader{display:none;position:fixed;inset:0;background:rgba(248,247,244,0.88);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(3px);}
+#loader.show{display:flex;}
+.spin{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--or);border-radius:50%;animation:sp 0.7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.ltxt{font-family:var(--fh);font-size:15px;font-weight:600;color:var(--t2);letter-spacing:2px;text-transform:uppercase;}
+
+@media(max-width:600px){.topbar{padding:0 14px;}.page{padding:14px;}.tb-sub{display:none;}.rep-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="spin"></div><div class="ltxt" id="loaderTxt">Loading...</div></div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-brand">
+    <svg class="tb-logo" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <rect width="512" height="512" rx="80" fill="#FF6B00"/>
+      <circle cx="160" cy="340" r="65" fill="none" stroke="#fff" stroke-width="18"/>
+      <circle cx="160" cy="340" r="7" fill="#fff"/>
+      <circle cx="368" cy="340" r="60" fill="none" stroke="#fff" stroke-width="18"/>
+      <circle cx="368" cy="340" r="7" fill="#fff"/>
+      <path d="M160 340 L210 225 L300 205 L368 275 L368 340" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M210 225 Q258 195 318 210 L300 205 L210 225Z" fill="#FFD4B0"/>
+    </svg>
+    <div>
+      <span class="tb-name">DHOOM</span>
+      <span class="tb-sub">Salary Summary</span>
+    </div>
+  </div>
+  <div class="tb-right">
+    <span class="tb-upd" id="lastUpd">—</span>
+    <button class="btn-back" id="backBtn" onclick="showList()" style="display:none">← All Reps</button>
+    <button class="btn-rf" id="rfBtn" onclick="loadData()">↺ Refresh</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="errbanner" id="errBanner"></div>
+
+  <!-- FILTER BAR -->
+  <div class="fbar">
+    <div class="fbar-title">Select Period</div>
+    <div class="dchips">
+      <div class="dc" onclick="setQuick('thismonth')">📅 This Month</div>
+      <div class="dc" onclick="setQuick('lastmonth')">⏮ Last Month</div>
+      <div class="dc" onclick="setQuick('last7')">📆 Last 7 Days</div>
+      <div class="dc" onclick="setQuick('last30')">🗓 Last 30 Days</div>
+    </div>
+    <div class="fbar-row">
+      <div class="fg"><div class="fl">From Date</div><input type="date" class="fi" id="fFrom"></div>
+      <div class="fg"><div class="fl">To Date</div><input type="date" class="fi" id="fTo"></div>
+      <button class="btn-apply" onclick="applyAndRender()">Apply</button>
+      <button class="btn-clear" onclick="clearFilters()">✕ Clear</button>
+    </div>
+  </div>
+
+  <!-- REP LIST VIEW -->
+  <div id="listView">
+    <div class="rep-grid" id="repGrid"></div>
+  </div>
+
+  <!-- REP DETAIL VIEW -->
+  <div id="detailView">
+    <div class="detail-header">
+      <div class="detail-rep-name" id="detailName">—</div>
+      <div class="detail-period" id="detailPeriod">—</div>
+      <div class="detail-kpis" id="detailKpis"></div>
+    </div>
+    <div class="erow">
+      <button class="btn-exp" onclick="exportRepCSV()">⬇ Export CSV</button>
+      <button class="btn-exp" onclick="window.print()">🖨 Print</button>
+    </div>
+    <div class="day-table-card">
+      <div class="day-table-head">
+        <div class="day-table-title">Day-wise Attendance & Activity</div>
+        <div style="font-size:12px;color:var(--t3);" id="detailCount">—</div>
+      </div>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Day</th>
+              <th>Status</th>
+              <th>First Call</th>
+              <th>Last Call</th>
+              <th>Total Calls</th>
+              <th>Orders (₹)</th>
+              <th>Collection (₹)</th>
+              <th>Parties Visited</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysz5L-MOu0T6IH-c9CmRzCRpE6DoUynVvBhhfSALPmv8_Za5XX1910kW8HD4TJz6bdUA/exec";
+// ════════════════════════════════
+
+var allRows = [];
+var currentRep = null;
+var currentRepRows = [];
+
+window.onload = function(){
+  setQuick('thismonth');
+  loadData();
+};
+
+// ── QUICK DATE ──
+function setQuick(q){
+  document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
+  event && event.target && event.target.classList && event.target.classList.add('active');
+  var now=new Date(), from=new Date(), to=new Date();
+  if(q==='thismonth'){from=new Date(now.getFullYear(),now.getMonth(),1);to=now;}
+  else if(q==='lastmonth'){
+    from=new Date(now.getFullYear(),now.getMonth()-1,1);
+    to=new Date(now.getFullYear(),now.getMonth(),0);
+  }
+  else if(q==='last7'){from=new Date(now-7*864e5);to=now;}
+  else if(q==='last30'){from=new Date(now-30*864e5);to=now;}
+  document.getElementById('fFrom').value=fmt(from);
+  document.getElementById('fTo').value=fmt(to);
+  if(allRows.length) applyAndRender();
+}
+
+function fmt(d){return d.toISOString().slice(0,10);}
+
+function clearFilters(){
+  document.querySelectorAll('.dc').forEach(function(d){d.classList.remove('active');});
+  setQuick('thismonth');
+}
+
+// ── LOAD DATA ──
+function loadData(){
+  showLoader('Loading attendance data...');
+  document.getElementById('rfBtn').disabled=true;
+  document.getElementById('errBanner').classList.remove('show');
+  fetch(SCRIPT_URL + "?action=all&cb=" + Date.now())
+    .then(function(r){
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return r.json();
+    })
+    .then(function(data){
+      if(!data.success) throw new Error(data.error||"Script error");
+      allRows = (data.rows||[]).map(function(r){
+        // Normalize date
+        var rawDate=String(r.date||'');
+        if(rawDate.length>10 && rawDate.indexOf('-')===-1){
+          var d=new Date(rawDate);
+          if(!isNaN(d.getTime())) rawDate=fmt(d);
+        }
+        // Normalize time
+        var rawTime=String(r.time||'');
+        if(rawTime.length>8){
+          var td=new Date(rawTime);
+          if(!isNaN(td.getTime())) rawTime=pad(td.getHours())+':'+pad(td.getMinutes());
+        }
+        return {
+          date:rawDate, time:rawTime,
+          userId:r.userId, repName:String(r.repName||'').trim(),
+          party:String(r.party||'').trim(),
+          station:String(r.station||'').trim(),
+          order:Number(r.order)||0,
+          collection:Number(r.collection)||0,
+          rating:String(r.rating||'').trim()
+        };
+      }).filter(function(r){return r.repName && r.date;});
+
+      hideLoader();
+      document.getElementById('rfBtn').disabled=false;
+      document.getElementById('lastUpd').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      applyAndRender();
+    })
+    .catch(function(err){
+      hideLoader();
+      document.getElementById('rfBtn').disabled=false;
+      document.getElementById('errBanner').textContent='⚠️ Could not connect: '+err.message;
+      document.getElementById('errBanner').classList.add('show');
+    });
+}
+
+function pad(n){return n<10?'0'+n:String(n);}
+
+// ── FILTER & RENDER ──
+function applyAndRender(){
+  var fr=document.getElementById('fFrom').value;
+  var to=document.getElementById('fTo').value;
+  var filtered=allRows.filter(function(r){
+    if(fr && r.date<fr) return false;
+    if(to && r.date>to) return false;
+    return true;
+  });
+
+  if(currentRep){
+    // Re-render detail view with new filter
+    showDetail(currentRep, filtered);
+  } else {
+    renderRepGrid(filtered, fr, to);
+  }
+}
+
+// ── REP GRID ──
+function renderRepGrid(rows, fr, to){
+  // Group by rep
+  var reps={};
+  rows.forEach(function(r){
+    if(!reps[r.repName]) reps[r.repName]={rows:[],days:{}};
+    reps[r.repName].rows.push(r);
+    reps[r.repName].days[r.date]=1;
+  });
+
+  // Generate all dates in range for absent tracking
+  var allDates=getDatesInRange(fr,to);
+
+  var sorted=Object.keys(reps).sort();
+  if(!sorted.length){
+    document.getElementById('repGrid').innerHTML='<div style="color:var(--t3);font-size:14px;text-align:center;padding:40px;grid-column:1/-1;">No data for selected period.</div>';
+    return;
+  }
+
+  var html=sorted.map(function(name){
+    var d=reps[name];
+    var workDays=Object.keys(d.days).length;
+    var totalDays=allDates.length;
+    var totalCalls=d.rows.length;
+    var totalOrder=d.rows.reduce(function(s,r){return s+r.order;},0);
+    var totalColl=d.rows.reduce(function(s,r){return s+r.collection;},0);
+
+    // Working days dots (max 31)
+    var dots=allDates.slice(0,31).map(function(dt){
+      return '<div class="wd-dot '+(d.days[dt]?'wd-present':'wd-absent')+'" title="'+dt+'"></div>';
+    }).join('');
+
+    // Attendance %
+    var attPct=totalDays>0?Math.round(workDays/totalDays*100):0;
+    var attBadge=attPct>=80?'b-green':attPct>=60?'b-amber':'b-red';
+
+    return '<div class="rep-card" onclick="openRep(\''+name.replace(/'/g,"\\'")+'\')">'+
+      '<div class="rep-card-stripe"></div>'+
+      '<div class="rep-name">'+name+'</div>'+
+      '<div class="rep-stats">'+
+        '<div class="rs"><div class="rs-num orange">'+workDays+'</div><div class="rs-lbl">Working Days</div></div>'+
+        '<div class="rs"><div class="rs-num">'+totalCalls+'</div><div class="rs-lbl">Total Calls</div></div>'+
+        '<div class="rs"><div class="rs-num">₹'+fmtM(totalOrder)+'</div><div class="rs-lbl">Orders</div></div>'+
+        '<div class="rs"><div class="rs-num">₹'+fmtM(totalColl)+'</div><div class="rs-lbl">Collection</div></div>'+
+      '</div>'+
+      '<div class="rep-working-days">'+
+        '<span class="badge '+attBadge+'">'+attPct+'% attendance</span> &nbsp;'+workDays+' of '+totalDays+' days'+
+        '<div class="rep-wd-bar">'+dots+'</div>'+
+      '</div>'+
+      '<div class="click-hint">Tap for day-wise detail →</div>'+
+    '</div>';
+  }).join('');
+
+  document.getElementById('repGrid').innerHTML=html;
+}
+
+function fmtM(n){
+  if(n>=100000) return (n/100000).toFixed(1)+'L';
+  if(n>=1000) return (n/1000).toFixed(1)+'K';
+  return n.toLocaleString('en-IN');
+}
+
+// ── OPEN REP DETAIL ──
+function openRep(name){
+  currentRep=name;
+  var fr=document.getElementById('fFrom').value;
+  var to=document.getElementById('fTo').value;
+  var filtered=allRows.filter(function(r){
+    if(r.repName!==name) return false;
+    if(fr && r.date<fr) return false;
+    if(to && r.date>to) return false;
+    return true;
+  });
+  showDetail(name, filtered);
+  document.getElementById('backBtn').style.display='';
+  document.getElementById('listView').style.display='none';
+  document.getElementById('detailView').style.display='';
+  window.scrollTo(0,0);
+}
+
+function showDetail(name, rows){
+  var fr=document.getElementById('fFrom').value;
+  var to=document.getElementById('fTo').value;
+  var allDates=getDatesInRange(fr,to);
+
+  // Group by date
+  var byDate={};
+  rows.forEach(function(r){
+    if(!byDate[r.date]) byDate[r.date]={times:[],parties:[],order:0,collection:0};
+    if(r.time) byDate[r.date].times.push(r.time);
+    if(r.party) byDate[r.date].parties.push(r.party);
+    byDate[r.date].order+=r.order;
+    byDate[r.date].collection+=r.collection;
+  });
+
+  // KPIs
+  var workDays=Object.keys(byDate).length;
+  var totalDays=allDates.length;
+  var totalCalls=rows.length;
+  var totalOrder=rows.reduce(function(s,r){return s+r.order;},0);
+  var totalColl=rows.reduce(function(s,r){return s+r.collection;},0);
+  var avgCalls=workDays>0?(totalCalls/workDays).toFixed(1):0;
+
+  document.getElementById('detailName').textContent=name;
+  document.getElementById('detailPeriod').textContent=(fr||'Start')+' to '+(to||'Today');
+  document.getElementById('detailCount').textContent=workDays+' working days';
+
+  document.getElementById('detailKpis').innerHTML=
+    '<div class="dk"><div class="dk-num orange">'+workDays+'</div><div class="dk-lbl">Working Days</div></div>'+
+    '<div class="dk"><div class="dk-num">'+totalDays+'</div><div class="dk-lbl">Total Days</div></div>'+
+    '<div class="dk"><div class="dk-num">'+(totalDays>0?Math.round(workDays/totalDays*100):0)+'%</div><div class="dk-lbl">Attendance</div></div>'+
+    '<div class="dk"><div class="dk-num">'+totalCalls+'</div><div class="dk-lbl">Total Calls</div></div>'+
+    '<div class="dk"><div class="dk-num">'+avgCalls+'</div><div class="dk-lbl">Avg Calls/Day</div></div>'+
+    '<div class="dk"><div class="dk-num">₹'+fmtM(totalOrder)+'</div><div class="dk-lbl">Total Orders</div></div>'+
+    '<div class="dk"><div class="dk-num">₹'+fmtM(totalColl)+'</div><div class="dk-lbl">Collection</div></div>';
+
+  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  // Build table — ALL dates in range
+  var bodyHTML=allDates.map(function(dt){
+    var d=byDate[dt];
+    var dayName=days[new Date(dt+'T00:00:00').getDay()];
+    var isSun=dayName==='Sun';
+
+    if(!d){
+      // Absent
+      return '<tr style="'+(isSun?'opacity:0.5':'')+'">'+
+        '<td><b>'+dt+'</b></td>'+
+        '<td style="color:var(--t3)">'+dayName+'</td>'+
+        '<td><span class="badge '+(isSun?'':'b-red')+'">'+(isSun?'Sunday':'Absent')+'</span></td>'+
+        '<td style="color:var(--t3)">—</td>'+
+        '<td style="color:var(--t3)">—</td>'+
+        '<td style="color:var(--t3)">0</td>'+
+        '<td style="color:var(--t3)">—</td>'+
+        '<td style="color:var(--t3)">—</td>'+
+        '<td style="color:var(--t3)">—</td>'+
+      '</tr>';
+    }
+
+    var times=d.times.sort();
+    var firstCall=times.length?fmt12(times[0]):'—';
+    var lastCall=times.length>1?fmt12(times[times.length-1]):(times.length?fmt12(times[0]):'—');
+    var uniqueParties=[...new Set(d.parties)];
+
+    return '<tr>'+
+      '<td><b>'+dt+'</b></td>'+
+      '<td>'+dayName+'</td>'+
+      '<td><span class="badge b-green">Present</span></td>'+
+      '<td style="color:var(--gr);font-weight:700;">'+firstCall+'</td>'+
+      '<td style="color:var(--or);font-weight:700;">'+lastCall+'</td>'+
+      '<td style="font-weight:700;font-size:16px;">'+d.times.length+'</td>'+
+      '<td style="color:var(--bl);font-weight:700;">'+(d.order?'₹'+d.order.toLocaleString('en-IN'):'—')+'</td>'+
+      '<td style="color:var(--gr);font-weight:700;">'+(d.collection?'₹'+d.collection.toLocaleString('en-IN'):'—')+'</td>'+
+      '<td style="font-size:12px;color:var(--t2);max-width:200px;">'+uniqueParties.slice(0,4).join(', ')+(uniqueParties.length>4?' +'+( uniqueParties.length-4)+' more':'')+'</td>'+
+    '</tr>';
+  }).join('');
+
+  document.getElementById('detailBody').innerHTML=bodyHTML;
+  currentRepRows=rows;
+}
+
+function fmt12(t){
+  if(!t) return '—';
+  var p=t.split(':'),h=parseInt(p[0]),m=p[1]||'00',ampm=h>=12?'pm':'am';
+  h=h%12||12;
+  return h+':'+m+' '+ampm;
+}
+
+// ── BACK TO LIST ──
+function showList(){
+  currentRep=null;
+  document.getElementById('backBtn').style.display='none';
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('listView').style.display='';
+}
+
+// ── DATE RANGE HELPER ──
+function getDatesInRange(from, to){
+  if(!from||!to) return [];
+  var dates=[], cur=new Date(from+'T00:00:00'), end=new Date(to+'T00:00:00');
+  while(cur<=end){
+    dates.push(fmt(cur));
+    cur.setDate(cur.getDate()+1);
+  }
+  return dates;
+}
+
+// ── EXPORT CSV ──
+function exportRepCSV(){
+  if(!currentRep) return;
+  var fr=document.getElementById('fFrom').value;
+  var to=document.getElementById('fTo').value;
+  var allDates=getDatesInRange(fr,to);
+  var byDate={};
+  currentRepRows.forEach(function(r){
+    if(!byDate[r.date]) byDate[r.date]={times:[],parties:[],order:0,collection:0};
+    if(r.time) byDate[r.date].times.push(r.time);
+    if(r.party) byDate[r.date].parties.push(r.party);
+    byDate[r.date].order+=r.order;
+    byDate[r.date].collection+=r.collection;
+  });
+  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var hdrs=["Date","Day","Status","First Call","Last Call","Total Calls","Orders Rs","Collection Rs","Parties Visited"];
+  var rowsCSV=[hdrs].concat(allDates.map(function(dt){
+    var d=byDate[dt];
+    var dayName=days[new Date(dt+'T00:00:00').getDay()];
+    if(!d) return [dt,dayName,dayName==='Sun'?'Sunday':'Absent','—','—','0','—','—','—'];
+    var times=d.times.sort();
+    var up=[...new Set(d.parties)];
+    return [dt,dayName,'Present',times.length?times[0]:'—',times.length?times[times.length-1]:'—',d.times.length,d.order,d.collection,up.join(' | ')];
+  }));
+  var csv=rowsCSV.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='salary-'+currentRep.replace(/\s+/g,'-')+'-'+fr+'-to-'+to+'.csv';
+  a.click();
+}
+
+function showLoader(t){document.getElementById('loaderTxt').textContent=t||'Loading...';document.getElementById('loader').classList.add('show');}
+function hideLoader(){document.getElementById('loader').classList.remove('show');}
+</script>
+</body>
+</html>
