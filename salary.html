@@ -94,6 +94,31 @@ tbody tr:hover{background:#FFFAF5;}
 tbody td{padding:11px 16px;font-size:14px;vertical-align:middle;}
 .row-absent td{background:#FAFAF8;color:var(--t3);}
 .row-sunday td{background:#F5F5F2;color:var(--t3);opacity:0.7;}
+.row-clickable{cursor:pointer;}
+
+/* DAY MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(17,17,17,0.5);z-index:300;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:#fff;border-radius:16px;max-width:480px;width:100%;max-height:82vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.25);}
+.modal-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:#fff;border-radius:16px 16px 0 0;}
+.modal-rep{font-family:var(--fh);font-size:19px;font-weight:700;letter-spacing:0.3px;}
+.modal-date{font-size:13px;color:var(--t2);margin-top:3px;}
+.modal-close{background:var(--bg);border:none;width:30px;height:30px;min-width:30px;border-radius:8px;font-size:15px;cursor:pointer;color:var(--t2);}
+.modal-close:hover{background:var(--orl);color:var(--or);}
+.modal-body{padding:16px 20px 20px;}
+.modal-summary{display:flex;gap:10px;margin-bottom:14px;}
+.ms{flex:1;background:var(--bg);border-radius:10px;padding:10px 12px;text-align:center;}
+.ms-num{font-family:var(--fh);font-size:18px;font-weight:700;}
+.ms-lbl{font-size:10px;color:var(--t3);font-weight:600;margin-top:2px;}
+.visit-item{background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:9px;border-left:3px solid var(--or);}
+.visit-item:last-child{margin-bottom:0;}
+.visit-top{display:flex;align-items:center;justify-content:space-between;}
+.visit-time{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--or);}
+.visit-idx{font-size:11px;color:var(--t3);font-weight:600;}
+.visit-party{font-size:14px;font-weight:600;margin-top:3px;color:var(--text);}
+.visit-stats{display:flex;gap:16px;margin-top:8px;font-size:12px;color:var(--t2);}
+.visit-stats b{color:var(--text);}
+.no-visits{text-align:center;padding:34px 10px;color:var(--t3);font-size:14px;}
 
 .erow{display:flex;gap:8px;margin-bottom:16px;}
 .btn-exp{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fb);color:var(--t2);}
@@ -184,6 +209,20 @@ tbody td{padding:11px 16px;font-size:14px;vertical-align:middle;}
         </table>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- DAY DETAIL MODAL -->
+<div class="modal-overlay" id="dayModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-rep" id="dmRepName">—</div>
+        <div class="modal-date" id="dmDate">—</div>
+      </div>
+      <button class="modal-close" id="dmCloseBtn">✕</button>
+    </div>
+    <div class="modal-body" id="dmBody"></div>
   </div>
 </div>
 
@@ -469,7 +508,7 @@ function renderDetail(name, rows){
       var status = isSun
         ? '<span class="badge b-gray">Sunday</span>'
         : '<span class="badge b-red">Absent</span>';
-      return '<tr class="' + rowCls + '">' +
+      return '<tr class="' + rowCls + ' row-clickable" data-date="' + dt + '">' +
         '<td><b>' + dt + '</b></td>' +
         '<td>' + dayName + '</td>' +
         '<td>' + status + '</td>' +
@@ -482,7 +521,7 @@ function renderDetail(name, rows){
     var firstCall = times.length ? fmt12(times[0]) : "—";
     var lastCall  = times.length > 1 ? fmt12(times[times.length - 1]) : (times.length === 1 ? fmt12(times[0]) + " (only)" : "—");
 
-    return '<tr>' +
+    return '<tr class="row-clickable" data-date="' + dt + '">' +
       '<td><b>' + dt + '</b></td>' +
       '<td>' + dayName + '</td>' +
       '<td><span class="badge b-green">Present</span></td>' +
@@ -493,6 +532,13 @@ function renderDetail(name, rows){
   }).join("");
 
   document.getElementById("detailBody").innerHTML = bodyHTML;
+
+  // Wire up click-to-open-day-modal on every row
+  document.querySelectorAll("#detailBody tr.row-clickable").forEach(function(tr){
+    tr.addEventListener("click", function(){
+      openDayDetail(tr.getAttribute("data-date"));
+    });
+  });
 }
 
 function fmt12(t){
@@ -502,6 +548,67 @@ function fmt12(t){
   h = h % 12 || 12;
   return h + ":" + m + ampm;
 }
+
+// ── DAY DETAIL MODAL ──
+function openDayDetail(dt){
+  var dow     = new Date(dt + "T00:00:00").getDay();
+  var dayName = DAYS[dow];
+
+  // Only this rep's visits, on this exact date
+  var dayRows = currentRepRows
+    .filter(function(r){ return r.date === dt; })
+    .sort(function(a,b){ return (a.time || "").localeCompare(b.time || ""); });
+
+  document.getElementById("dmRepName").textContent = currentRep;
+  document.getElementById("dmDate").textContent = dt + "  ·  " + dayName;
+
+  var body = document.getElementById("dmBody");
+
+  if(!dayRows.length){
+    var msg = dow === 0 ? "Sunday — no visits scheduled." : "Absent — no visits recorded on this day.";
+    body.innerHTML = '<div class="no-visits">' + msg + '</div>';
+  } else {
+    var dayOrder = dayRows.reduce(function(s,r){ return s + r.order; }, 0);
+    var dayColl  = dayRows.reduce(function(s,r){ return s + r.collection; }, 0);
+
+    var summaryHTML =
+      '<div class="modal-summary">' +
+        '<div class="ms"><div class="ms-num">' + dayRows.length + '</div><div class="ms-lbl">Visits</div></div>' +
+        '<div class="ms"><div class="ms-num">₹' + fmtN(dayOrder) + '</div><div class="ms-lbl">Orders</div></div>' +
+        '<div class="ms"><div class="ms-num">₹' + fmtN(dayColl) + '</div><div class="ms-lbl">Collection</div></div>' +
+      '</div>';
+
+    var itemsHTML = dayRows.map(function(r, i){
+      return '<div class="visit-item">' +
+        '<div class="visit-top">' +
+          '<span class="visit-time">' + fmt12(r.time) + '</span>' +
+          '<span class="visit-idx">Visit ' + (i + 1) + ' of ' + dayRows.length + '</span>' +
+        '</div>' +
+        '<div class="visit-party">' + (r.party || "—") + '</div>' +
+        '<div class="visit-stats">' +
+          '<span>Order: <b>₹' + fmtN(r.order) + '</b></span>' +
+          '<span>Collection: <b>₹' + fmtN(r.collection) + '</b></span>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+
+    body.innerHTML = summaryHTML + itemsHTML;
+  }
+
+  document.getElementById("dayModalOverlay").classList.add("show");
+}
+
+function closeDayModal(){
+  document.getElementById("dayModalOverlay").classList.remove("show");
+}
+
+document.getElementById("dmCloseBtn").addEventListener("click", closeDayModal);
+document.getElementById("dayModalOverlay").addEventListener("click", function(e){
+  if(e.target.id === "dayModalOverlay") closeDayModal();
+});
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape") closeDayModal();
+});
 
 // ── BACK ──
 function showList(){
