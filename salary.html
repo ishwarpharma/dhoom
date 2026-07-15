@@ -250,13 +250,21 @@ function buildMonthTabs(){
 }
 
 function selectMonth(yr, mo){
-  var from = new Date(yr, mo, 1);
-  var to   = new Date(yr, mo + 1, 0); // last day of month
+  var from  = new Date(yr, mo, 1);
+  var to    = new Date(yr, mo + 1, 0); // last day of month
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // If this month runs into the future, stop at today — no point
+  // showing/counting days that haven't happened yet.
+  if(to > today) to = today;
+
   selectedFrom = fmt(from);
   selectedTo   = fmt(to);
+  var dayCount = Math.round((to - from) / 86400000) + 1;
   document.getElementById("periodLabel").textContent =
     "Period: " + selectedFrom + "  to  " + selectedTo +
-    "  (" + to.getDate() + " days)";
+    "  (" + dayCount + " days)";
   if(allRows.length) applyAndRender();
 }
 
@@ -449,8 +457,8 @@ function renderDetail(name, rows){
     '<div class="dk"><div class="dk-num">₹' + fmtN(totalOrder) + '</div><div class="dk-lbl">Total Orders</div></div>' +
     '<div class="dk"><div class="dk-num">₹' + fmtN(totalColl) + '</div><div class="dk-lbl">Collection</div></div>';
 
-  // Table rows
-  var bodyHTML = allDates.map(function(dt){
+  // Table rows — newest first (today at the top, working backward)
+  var bodyHTML = allDates.slice().reverse().map(function(dt){
     var dow     = new Date(dt + "T00:00:00").getDay();
     var dayName = DAYS[dow];
     var isSun   = dow === 0;
@@ -522,7 +530,7 @@ function exportCSV(){
     if(r.time) byDate[r.date].times.push(r.time);
   });
   var hdrs = ["Date","Day","Status","First Call","Last Call","Total Visits"];
-  var csv  = [hdrs].concat(allDates.map(function(dt){
+  var csv  = [hdrs].concat(allDates.slice().reverse().map(function(dt){
     var dow     = new Date(dt + "T00:00:00").getDay();
     var dayName = DAYS[dow];
     var d       = byDate[dt];
