@@ -141,7 +141,7 @@ tbody td{padding:11px 16px;font-size:14px;vertical-align:middle;}
   <!-- MONTH TABS -->
   <div class="month-tabs-wrap">
     <div class="month-tabs-title">Select Month</div>
-    <div class="month-tabs" id="monthTabs"></div>
+    <div class="month-tabs" id="monthTabs"><span style="font-size:13px;color:var(--t3);">Loading months…</span></div>
     <div class="period-label" id="periodLabel">—</div>
   </div>
 
@@ -200,23 +200,40 @@ var MONTHS = ["January","February","March","April","May","June","July","August",
 
 // ── BOOT ──
 window.onload = function(){
-  buildMonthTabs();
   loadData();
 };
 
-// ── BUILD 12 MONTH TABS ──
+// ── BUILD MONTH TABS — ONLY FOR MONTHS THAT HAVE DATA ──
 function buildMonthTabs(){
-  var now = new Date();
   var tabs = document.getElementById("monthTabs");
   tabs.innerHTML = "";
-  // Generate last 12 months + current
-  for(var i = 11; i >= 0; i--){
-    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    var yr = d.getFullYear();
-    var mo = d.getMonth(); // 0-based
+
+  // Collect distinct yyyy-mm keys present in the loaded rows
+  var monthSet = {};
+  allRows.forEach(function(r){
+    if(r.date && r.date.length >= 7) monthSet[r.date.slice(0, 7)] = true;
+  });
+  var monthKeys = Object.keys(monthSet).sort(); // ascending: "2025-08", "2025-09", ...
+
+  if(!monthKeys.length){
+    tabs.innerHTML = '<span style="font-size:13px;color:var(--t3);">No data available yet.</span>';
+    document.getElementById("periodLabel").textContent = "—";
+    document.getElementById("repGrid").innerHTML =
+      '<div style="color:var(--t3);text-align:center;padding:40px;grid-column:1/-1;font-size:14px;">No data found.</div>';
+    return;
+  }
+
+  // Keep the currently selected month if it still has data, else default to the latest month
+  var prevKey = selectedFrom ? selectedFrom.slice(0, 7) : "";
+  var defaultKey = monthKeys.indexOf(prevKey) !== -1 ? prevKey : monthKeys[monthKeys.length - 1];
+
+  monthKeys.forEach(function(key){
+    var parts = key.split("-");
+    var yr = parseInt(parts[0], 10);
+    var mo = parseInt(parts[1], 10) - 1; // 0-based
     var label = MONTHS[mo].substring(0,3) + " " + yr;
     var btn = document.createElement("div");
-    btn.className = "mtab" + (i === 0 ? " active" : "");
+    btn.className = "mtab" + (key === defaultKey ? " active" : "");
     btn.textContent = label;
     btn.setAttribute("data-yr", yr);
     btn.setAttribute("data-mo", mo);
@@ -226,9 +243,10 @@ function buildMonthTabs(){
       selectMonth(parseInt(this.getAttribute("data-yr")), parseInt(this.getAttribute("data-mo")));
     };
     tabs.appendChild(btn);
-  }
-  // Default: current month
-  selectMonth(now.getFullYear(), now.getMonth());
+  });
+
+  var dp = defaultKey.split("-");
+  selectMonth(parseInt(dp[0], 10), parseInt(dp[1], 10) - 1);
 }
 
 function selectMonth(yr, mo){
@@ -242,7 +260,7 @@ function selectMonth(yr, mo){
   if(allRows.length) applyAndRender();
 }
 
-function fmt(d){ return d.toISOString().slice(0,10); }
+function fmt(d){ return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
 function pad(n){ return n < 10 ? "0" + n : String(n); }
 
 // ── LOAD DATA ──
@@ -289,7 +307,7 @@ function loadData(){
       document.getElementById("rfBtn").disabled = false;
       document.getElementById("lastUpd").textContent =
         "Updated " + new Date().toLocaleTimeString("en-IN", {hour:"2-digit", minute:"2-digit"});
-      applyAndRender();
+      buildMonthTabs();
     })
     .catch(function(err){
       hideLoader();
@@ -392,7 +410,7 @@ function openRep(name){
   renderDetail(name, repRows);
   document.getElementById("backBtn").style.display = "";
   document.getElementById("listView").style.display = "none";
-  document.getElementById("detailView").style.display = "";
+  document.getElementById("detailView").style.display = "block";
   window.scrollTo(0, 0);
 }
 
