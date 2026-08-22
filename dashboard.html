@@ -800,22 +800,10 @@ function renderTable(){
       locCell='<a class="map-btn" href="'+mapsUrl+'" target="_blank">📍 Map</a>';
     }
 
-    // Nearby parties — from ALL historical data, not just today
-    var nearby = getNearbyParties(r, locIndex);
-    var nearbyHTML = '';
-    if(nearby.length > 0){
-      nearbyHTML += '<div class="nearby-wrap"><span class="nearby-label">📌 Also recorded at this GPS:</span>';
-      nearby.forEach(function(n){
-        nearbyHTML += '<span class="nearby-chip" title="'+n.dist+'m from this GPS">'+
-          n.name+' <span style="opacity:0.65;font-size:9px;">('+n.dist+'m)</span></span>';
-      });
-      nearbyHTML += '</div>';
-    }
-
-    // Remark + nearby in same cell
-    var remarkCell = '<td style="min-width:160px;max-width:260px;vertical-align:top;">'+
-      (r[12]?'<div style="color:var(--t2);font-style:italic;font-size:12px;margin-bottom:4px;">'+r[12]+'</div>':'')+
-      nearbyHTML+'</td>';
+   // Google Address
+var addressCell = '<td style="min-width:250px;max-width:450px;vertical-align:top;white-space:normal;line-height:1.4;">'+
+  (r[13] || '<span style="color:var(--t3)">—</span>')+
+  '</td>';
 
     return '<tr>'+
       '<td style="color:var(--t3);white-space:nowrap">'+r[0]+'</td>'+
