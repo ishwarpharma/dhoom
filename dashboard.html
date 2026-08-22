@@ -271,7 +271,7 @@ tbody td{padding:10px 13px;font-size:13px;vertical-align:middle;}
             <th onclick="sortBy(10)">Collection ₹ ↕</th>
             <th onclick="sortBy(11)">Rating ↕</th>
             <th>Location</th>
-            <th>Google Address</th>
+            <th>Remark / Address</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -661,10 +661,13 @@ function renderTable(){
       locCell='<a class="map-btn" href="'+mapsUrl+'" target="_blank">📍 Map</a>';
     }
 
-    // Google Address (from Google Sheet column index 13, written by n8n)
+    // Remark + Google Address (from Google Sheet column index 12 & 13)
+    // Shown as two lines in one cell — remark (what happened) on top, address below
+    var remarkLine = r[12] ? '<div style="color:var(--t2);font-style:italic;font-size:12px;margin-bottom:4px;">'+r[12]+'</div>' : '';
+    var addressLine = r[13] ? '<div>'+r[13]+'</div>' : '';
     var addressCell =
       '<td style="min-width:250px;max-width:450px;vertical-align:top;white-space:normal;line-height:1.4;">' +
-      (r[13] ? r[13] : '<span style="color:var(--t3)">—</span>') +
+      (remarkLine || addressLine ? remarkLine + addressLine : '<span style="color:var(--t3)">—</span>') +
       '</td>';
 
     return '<tr>'+
