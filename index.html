@@ -161,6 +161,13 @@ textarea.field-input{resize:none;height:80px;}
 /* ── TOAST ── */
 #toast{position:fixed;bottom:calc(var(--safe-bot)+20px);left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:700;z-index:9990;transition:transform 0.3s;white-space:nowrap;}
 #toast.show{transform:translateX(-50%) translateY(0);}
+#installBanner{display:none;position:fixed;left:16px;right:16px;bottom:calc(var(--safe-bot)+16px);background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,0.18);z-index:9995;align-items:center;gap:12px;}
+#installBanner.show{display:flex;}
+#installBanner .ib-text{flex:1;font-size:13px;font-weight:600;color:var(--text);}
+#installBanner .ib-text small{display:block;font-weight:400;color:var(--text2);margin-top:2px;}
+#installBanner button{border:none;border-radius:10px;padding:10px 14px;font-weight:700;font-size:13px;font-family:var(--font);}
+#installBtnGo{background:var(--orange);color:#fff;}
+#installBtnClose{background:transparent;color:var(--text2);padding:10px 8px;}
 
 /* ── LOADER ── */
 #loader{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.85);z-index:9998;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
@@ -195,6 +202,12 @@ hr.div{border:none;border-top:1px solid var(--border);margin:12px 0;}
 
 <div id="loader"><div class="spin"></div><div class="load-txt" id="loaderText">Saving...</div></div>
 <div id="toast"></div>
+<!-- INSTALL APP BANNER (manual, since browsers show their auto-prompt only once) -->
+<div id="installBanner">
+  <div class="ib-text">Install Dhoom<small>Add to your home screen for one-tap access</small></div>
+  <button id="installBtnGo" onclick="doInstall()">Install</button>
+  <button id="installBtnClose" onclick="dismissInstallBanner()">✕</button>
+</div>
 <!-- LOCATION BLOCKER OVERLAY -->
 <div class="loc-blocker" id="locBlocker">
   <div class="loc-blocker-icon">📍</div>
@@ -409,11 +422,9 @@ window.onload = function() {
   registerSW();
   loadMasterData();
   setDate();
-  // Auto-login if PWA and previously logged in
-  if (CONFIG.IS_PWA) {
-    var u = localStorage.getItem("dhoom_u");
-    if (u) { try { state.user = JSON.parse(u); enterApp(); return; } catch(e){} }
-  }
+  // Auto-login if previously logged in (works in browser tab AND installed app)
+  var u = localStorage.getItem("dhoom_u");
+  if (u) { try { state.user = JSON.parse(u); enterApp(); return; } catch(e){} }
   // Restore today visits from localStorage
   var lv = localStorage.getItem("dhoom_visits_" + todayKey());
   if (lv) { try { state.visits = JSON.parse(lv); } catch(e){} }
@@ -436,6 +447,31 @@ function istMonthStr(d) {
   return istDateStr(d).slice(0,7);
 }
 
+
+// ── INSTALL PROMPT (custom, persistent control — Chrome's own mini-infobar only fires once) ──
+var deferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", function(e) {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  if (!CONFIG.IS_PWA && !localStorage.getItem("dhoom_install_dismissed")) {
+    document.getElementById("installBanner").classList.add("show");
+  }
+});
+function doInstall() {
+  document.getElementById("installBanner").classList.remove("show");
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(function(){ deferredInstallPrompt = null; });
+  }
+}
+function dismissInstallBanner() {
+  document.getElementById("installBanner").classList.remove("show");
+  localStorage.setItem("dhoom_install_dismissed", "1");
+}
+window.addEventListener("appinstalled", function() {
+  document.getElementById("installBanner").classList.remove("show");
+  localStorage.removeItem("dhoom_install_dismissed");
+});
 
 function registerSW() {
   if ("serviceWorker" in navigator) {
@@ -489,7 +525,7 @@ function verifyPin() {
       var match = users.find(function(u){ return u.pin === state.pin; });
       if (match) {
         state.user = match;
-        if (CONFIG.IS_PWA) localStorage.setItem("dhoom_u", JSON.stringify(match));
+        localStorage.setItem("dhoom_u", JSON.stringify(match));
         enterApp();
       } else {
         document.getElementById("pinError").textContent = "Wrong PIN. Try again.";
